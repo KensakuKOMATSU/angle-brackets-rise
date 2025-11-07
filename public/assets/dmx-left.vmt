@@ -12,15 +12,39 @@ NOTE LIGHTING
 pan:0 tilt:0 dimmer:0
 color: "rgb(0, 0, 0)"
 
-00:00:07.000 --> 00:00:09.500
+00:00:10.000 --> 00:00:30.000
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 32, "tilt": 160, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
+        { "pan": 255, "tilt": 160, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
     }
 }
 
-00:00:09.500 --> 00:00:12.000
+00:00:30.500 --> 00:00:45.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 255, "tilt": 160, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:00:46.000 --> 00:01:10.750
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 255, "tilt": 160, "dimmer": 255, "color": "rgb( 0, 255, 255 )" }
+    }
+}
+
+00:01:11.000 --> 00:01:26.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 255, "tilt": 160, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
+    }
+}
+
+00:01:35.000 --> 00:01:57.500
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
@@ -28,7 +52,7 @@ color: "rgb(0, 0, 0)"
     }
 }
 
-00:00:12.000 --> 00:00:14.500
+00:01:59.500 --> 00:02:13.500
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
@@ -36,7 +60,7 @@ color: "rgb(0, 0, 0)"
     }
 }
 
-00:00:14.500 --> 00:00:17.000
+00:02:14.750 --> 00:02:29.750
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
@@ -44,7 +68,7 @@ color: "rgb(0, 0, 0)"
     }
 }
 
-00:00:17.000 --> 00:00:19.500
+00:02:47.500 --> 00:03:17.000
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
@@ -52,10 +76,3 @@ color: "rgb(0, 0, 0)"
     }
 }
 
-00:00:19.500 --> 00:00:22.000
-{
-    "sync":
-    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 160, "tilt": 96, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
-    }
-}

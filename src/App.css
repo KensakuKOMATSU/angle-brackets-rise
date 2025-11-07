@@ -40,14 +40,31 @@
   z-index: 100;
 }
 
-.App main .audio-visualize {
+.App main .stars-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  z-index: 5;
+}
+.App main .stars-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  z-index: 5;
+}
+
+
+.App main .audio-visualizer {
   position: absolute;
   left: 0;
   right: 0;
-  top: 50%;
+  top: 0;
   bottom: 0;
   z-index: 10;
-  background-color: #999;
 }
 
 .App main .media-controller {
@@ -55,5 +72,12 @@
   top: 0;
   left: 0;
   right: 0;
+  z-index: 1002;
+}
+.App main .dashboard {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1002;
 }

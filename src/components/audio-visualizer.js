@@ -38,7 +38,6 @@ const AudioVisualizer = forwardRef((props, ref) => {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
                 // (1) MediaElementSource: video要素をAudioContextのソースとして接続
-                console.log( videoElem )
                 const source = audioCtx.createMediaElementSource(videoElem);
 
                 // (2) AnalyserNode: 音声データを分析するためのノードを作成
@@ -56,7 +55,6 @@ const AudioVisualizer = forwardRef((props, ref) => {
                 source.connect(analyser);
                 source.connect(audioCtx.destination); // これで音が聞こえるようになります
 
-                console.log('setupAudio finished')
                 // 描画ループの開始
                 draw();
 
@@ -77,15 +75,16 @@ const AudioVisualizer = forwardRef((props, ref) => {
             canvas.height = HEIGHT;
 
             // 背景をクリア
-            ctx.fillStyle = '#1a202c'; // 背景色
-            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+            //ctx.fillStyle = '#1a202c'; // 背景色
+            //ctx.fillRect(0, 0, WIDTH, HEIGHT);
+            ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
             // -----------------------------------------------------
             // A. タイムドメイン（波形/PCM）データの取得と描画
             // -----------------------------------------------------
             analyser.getByteTimeDomainData(dataArrayTime);
 
-            ctx.lineWidth = 4;
+            ctx.lineWidth = 2;
             //ctx.strokeStyle = 'rgb(129, 140, 248)'; // 薄い紫色 (Indigo-300)
             //const defaultColor = 'rgb(129, 140, 248)'; // 薄い紫色 (Indigo-300)
 
@@ -106,16 +105,14 @@ const AudioVisualizer = forwardRef((props, ref) => {
 
                 if (i === 0) {
                     ctx.beginPath();
-                    ctx.strokeStyle = _colorRef.current.left.color
-                    console.log( 'left', ctx.strokeStyle )
+                    ctx.strokeStyle = _colorRef.current?.left?.color 
                     ctx.moveTo(x, y);
                 } else if ( i === th ) {
                     ctx.lineTo( x, y )
                     ctx.stroke()
 
                     ctx.beginPath()
-                    ctx.strokeStyle = _colorRef.current.right.color
-                    console.log( 'right', ctx.strokeStyle )
+                    ctx.strokeStyle = _colorRef.current?.right?.color
                     ctx.moveTo( x, y )
                 } else {
                     ctx.lineTo(x, y);
@@ -156,7 +153,7 @@ const AudioVisualizer = forwardRef((props, ref) => {
                 ctx.font = '12px Inter';
                 ctx.fillText(`sampling rate [Hz]: ${audioCtx.sampleRate}`, 10, 20);
                 ctx.fillText(`FFT size: ${analyser.fftSize}`, 10, 35);
-                ctx.fillText(`colorRef: ${JSON.stringify( _colorRef.current )}`, 10, 50);
+                // ctx.fillText(`colorRef: ${JSON.stringify( _colorRef.current )}`, 10, 50);
             }
         }
 
