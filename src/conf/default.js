@@ -1,10 +1,10 @@
-//const map = {
-//    1: "pan", 2: "tilt", 3: "dimmer", 4: "red", 5: "green", 6: "blue", 7: "white", 8: "speed"
-//};
-
 const map = {
-    1: "red", 2: "green", 3: "blue", 4: "pan"
-}
+    1: "pan", 2: "tilt", 3: "dimmer", 4: "red", 5: "green", 6: "blue", 7: "white", 8: "speed"
+};
+
+// const map = {
+//     1: "red", 2: "green", 3: "blue", 4: "pan"
+// }
 
 export const colors = [
     'rgb(0, 119, 204)',

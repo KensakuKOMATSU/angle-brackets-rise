@@ -12,67 +12,562 @@ NOTE LIGHTING
 pan:0 tilt:0 dimmer:0
 color: "rgb(0, 0, 0)"
 
-00:00:10.000 --> 00:00:30.000
+00:00:06.000 --> 00:00:09.000
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 255, "tilt": 160, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
+        { "pan": 192, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 255, 255 )" }
     }
 }
 
-00:00:30.500 --> 00:00:45.500
+00:00:09.000 --> 00:00:10.000
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 255, "tilt": 160, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+        { "pan": 192, "tilt": 72, "dimmer": 0, "color": "rgb( 128, 128, 128 )" }
     }
 }
 
-00:00:46.000 --> 00:01:10.750
+00:00:10.000 --> 00:00:13.000
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 255, "tilt": 160, "dimmer": 255, "color": "rgb( 0, 255, 255 )" }
+        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
     }
 }
 
-00:01:11.000 --> 00:01:26.500
+00:00:13.000 --> 00:00:14.500
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 255, "tilt": 160, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
+        { "pan": 192, "tilt": 72, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
     }
 }
 
-00:01:35.000 --> 00:01:57.500
+00:00:14.500 --> 00:00:18.000
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 160, "tilt": 96, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+        { "pan": 150, "tilt": 30, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
     }
 }
 
-00:01:59.500 --> 00:02:13.500
+
+00:00:18.000 --> 00:00:22.000
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 32, "tilt": 160, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
+        { "pan": 150, "tilt": 128, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
     }
 }
 
-00:02:14.750 --> 00:02:29.750
+00:00:22.000 --> 00:00:26.500
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 160, "tilt": 96, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+        { "pan": 150, "tilt": 30, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
     }
 }
 
-00:02:47.500 --> 00:03:17.000
+00:00:26.500 --> 00:00:30.000
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 32, "tilt": 160, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
+        { "pan": 150, "tilt": 128, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
     }
 }
 
+00:00:30.000 --> 00:00:30.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 0, "color": "rgb( 0, 0, 128 )" }
+    }
+}
+
+
+
+00:00:30.500 --> 00:00:34.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:00:34.000 --> 00:00:38.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 128, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:00:38.000 --> 00:00:41.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:00:41.500 --> 00:00:45.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 128, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:00:45.500 --> 00:00:46.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 128, "dimmer": 0, "color": "rgb( 128, 0, 0 )" }
+    }
+}
+
+
+
+
+00:00:46.000 --> 00:00:50.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 255, "color": "rgb( 0, 255, 255 )" }
+    }
+}
+
+00:00:50.000 --> 00:00:53.750
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 30, "dimmer": 255, "color": "rgb( 0, 255, 255 )" }
+    }
+}
+
+00:00:53.750 --> 00:00:56.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 0, 255, 255 )" }
+    }
+}
+
+00:00:56.000 --> 00:00:58.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 30, "dimmer": 255, "color": "rgb( 0, 255, 255 )" }
+    }
+}
+
+00:00:58.000 --> 00:01:02.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:01:02.000 --> 00:01:04.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:01:04.000 --> 00:01:06.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:01:06.000 --> 00:01:10.750
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+
+00:01:11.000 --> 00:01:14.750
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 128, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:01:14.750 --> 00:01:19.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:01:19.000 --> 00:01:23.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 128, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:01:23.000 --> 00:01:26.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:01:26.500 --> 00:01:35.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 30, "dimmer": 0, "color": "rgb( 128, 0, 0 )" }
+    }
+}
+
+00:01:35.000 --> 00:01:37.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:01:37.500 --> 00:01:39.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 0, 255 )" }
+    }
+}
+
+00:01:39.500 --> 00:01:41.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 0, 255, 0 )" }
+    }
+}
+
+00:01:41.500 --> 00:01:43.750
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:01:43.750 --> 00:01:51.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 0, 255, 255 )" }
+    }
+}
+
+00:01:51.000 --> 00:01:57.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 255, 255 )" }
+    }
+}
+
+00:01:57.500 --> 00:01:59.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 0, "color": "rgb( 128, 128, 128 )" }
+    }
+}
+
+00:01:59.500 --> 00:02:03.250
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:02:03.250 --> 00:02:07.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:02:07.000 --> 00:02:10.750
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:02:10.750 --> 00:02:13.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:02:13.500 --> 00:02:14.750
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 72, "dimmer": 0, "color": "rgb( 128, 0, 0 )" }
+    }
+}
+
+
+00:02:14.750 --> 00:02:18.750
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:02:18.750 --> 00:02:22.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 128, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:02:22.000 --> 00:02:26.750
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:02:26.750 --> 00:02:29.750
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:02:29.750 --> 00:02:30.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 30, "dimmer": 0, "color": "rgb( 128, 128, 0 )" }
+    }
+}
+
+00:02:30.000 --> 00:02:31.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 30 , "dimmer": 160, "color": "rgb( 255, 255, 255 )" }
+    }
+}
+
+00:02:31.000 --> 00:02:32.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 160, "color": "rgb( 128, 128, 128 )" }
+    }
+}
+
+00:02:32.000 --> 00:02:33.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 160, "color": "rgb( 255, 255, 255 )" }
+    }
+}
+
+00:02:33.000 --> 00:02:34.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 128, 128, 128 )" }
+    }
+}
+
+00:02:34.000 --> 00:02:35.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 255, 255, 255 )" }
+    }
+}
+
+00:02:35.000 --> 00:02:36.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 128, 128, 128 )" }
+    }
+}
+
+00:02:36.000 --> 00:02:37.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 255, 255, 255 )" }
+    }
+}
+
+00:02:37.000 --> 00:02:38.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 128, 128, 128 )" }
+    }
+}
+
+00:02:38.000 --> 00:02:39.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 255, 255, 255 )" }
+    }
+}
+
+00:02:39.000 --> 00:02:40.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 128, 128, 128 )" }
+    }
+}
+
+00:02:40.000 --> 00:02:41.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 255, 255, 255 )" }
+    }
+}
+
+00:02:41.000 --> 00:02:42.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 128, 128, 128 )" }
+    }
+}
+
+00:02:42.000 --> 00:02:43.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 255, 255, 255 )" }
+    }
+}
+
+00:02:43.000 --> 00:02:44.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 128, 128, 128 )" }
+    }
+}
+
+00:02:44.000 --> 00:02:45.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 255, 255, 255 )" }
+    }
+}
+
+00:02:45.000 --> 00:02:46.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 128, 128, 128 )" }
+    }
+}
+
+00:02:46.000 --> 00:02:47.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 255, 255, 255 )" }
+    }
+}
+
+00:02:47.000 --> 00:02:47.750
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 128, "dimmer": 160, "color": "rgb( 128, 128, 128 )" }
+    }
+}
+
+00:02:47.500 --> 00:02:49.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 30, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
+    }
+}
+
+00:02:49.000 --> 00:02:51.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 0, 255 )" }
+    }
+}
+
+00:02:51.000 --> 00:02:55.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:02:55.000 --> 00:03:00.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:03:00.000 --> 00:03:05.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:03:05.000 --> 00:03:10.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:03:10.000 --> 00:03:13.750
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 192, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}

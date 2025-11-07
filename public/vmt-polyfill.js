@@ -110,6 +110,7 @@ const parseVmtFile = (data) => {
                 }
             } catch( e ) {
                 console.warn(`Error parsing JSON at line ${index + 1}:`, e);
+                console.warn('JSON String:', jsonStr);
             }
         }
     })

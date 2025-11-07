@@ -1,6 +1,5 @@
 WEBVTT
 
-
 00:01.000 --> 00:06.000
 “User agent, that’s you *W3C*... 
 Cache cleared.
@@ -31,6 +30,8 @@ living *Hypertext* takes the floor,
 
 00:26.500 --> 00:30.000
 we build a bridge from shore to shore.
+
+NOTE block
 
 00:30.500 --> 00:34.000
 Hands up high like promises resolved by night,
@@ -160,5 +161,12 @@ NOTE last block
 02:49.000 --> 02:51.000
 Ready, set?
 
-03:13.750 --> 03:17.000
+03:13.750 --> 03:16.000
 Let’s discuss our Web future.
+
+03:16.100 --> 04:00.000
+Lyric & Music by 
+Masakazu Muraoka @bathtimefish
+---
+Programming & Design by
+Kensaku Komatsu @komasshu
