@@ -1,0 +1,61 @@
+WEBVMT
+
+NOTE lighting sample
+
+MEDIA
+url:angle_brackets_rise.m4a
+mime-type:audio/mpeg
+
+NOTE Lighting config ( left side )
+
+NOTE LIGHTING
+pan:0 tilt:0 dimmer:0
+color: "rgb(0, 0, 0)"
+
+00:00:07.000 --> 00:00:09.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 32, "tilt": 160, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
+    }
+}
+
+00:00:09.500 --> 00:00:12.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 160, "tilt": 96, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:00:12.000 --> 00:00:14.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 32, "tilt": 160, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
+    }
+}
+
+00:00:14.500 --> 00:00:17.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 160, "tilt": 96, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:00:17.000 --> 00:00:19.500
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 32, "tilt": 160, "dimmer": 255, "color": "rgb( 0, 0, 255 )" }
+    }
+}
+
+00:00:19.500 --> 00:00:22.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 160, "tilt": 96, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+    }
+}

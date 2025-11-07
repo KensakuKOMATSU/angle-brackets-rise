@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>輝く星の円</title>
+    <!-- Tailwind CSSを読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* フォント設定 */
+        :root {
+            font-family: 'Inter', sans-serif;
+        }
+        /* キャンバスの基本的なスタイル */
+        #starCanvas {
+            background-color: #000000; /* 真っ暗な宇宙の背景 */
+            display: block;
+            border-radius: 0.75rem; /* rounded-lg */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-2xl">
+        <h1 class="text-2xl font-bold text-white text-center mb-4">Canvasで輝く円</h1>
+        <!-- キャンバスコンテナ -->
+        <div id="canvas-container" class="relative w-full aspect-square shadow-2xl shadow-indigo-500/50 rounded-lg">
+            <canvas id="starCanvas" class="w-full h-full"></canvas>
+        </div>
+        <p class="text-sm text-gray-400 text-center mt-4">中心の光の周りを粒子がキラキラと動き回るアニメーションです。</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let W, H;
+        let particles = [];
+        const PARTICLE_COUNT = 50;
+        const CENTER_COLOR = 'rgba(255, 255, 200, 0.9)'; // 中央の円の色 (薄い黄色)
+        const CENTER_RADIUS = 50;
+
+        /**
+         * キャンバスサイズを親要素に合わせて設定する
+         */
+        function resizeCanvas() {
+            const container = document.getElementById('canvas-container');
+            W = container.clientWidth;
+            H = container.clientHeight;
+            canvas.width = W;
+            canvas.height = H;
+        }
+
+        /**
+         * 光の粒子オブジェクトのクラス
+         */
+        class Particle {
+            constructor( centerX, centerY, color ) {
+              this.centerX = ( centerX || W / 4 ) + Math.floor( Math.random() * 25 );
+              this.centerY = ( centerY || H / 4 ) + Math.floor( Math.random() * 25 );
+              this.centerRadius = W / 3;
+                // 初期位置を中央付近に設定
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * this.centerRadius * 1.5;
+                this.x = this.centerX  + Math.cos(angle) * dist;
+                this.y = this.centerY + Math.sin(angle) * dist;
+
+                // 半径はランダムで小さく設定
+                this.radius = Math.random() * 1.5 + 0.5;
+
+                // ランダムな移動速度と方向
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 0.5,
+                    y: (Math.random() - 0.5) * 0.5
+                };
+
+                // 透明度をランダムに設定し、輝きを表現
+                this.alpha = Math.random();
+                //this.color = `rgba(255, 255, 255, ${this.alpha})`;
+                this.color = color || `rgb(255, 255, 255)`;
+
+                // 透明度の変化速度
+                this.fadeSpeed = Math.random() * 0.02 + 0.005;
+                this.fadingIn = true; // 現在増加中か減少中か
+            }
+
+            // 粒子の移動と透明度の更新
+            update() {
+                // 軽い摩擦を追加
+                // this.velocity.x *= 0.99;
+                // this.velocity.y *= 0.99;
+
+                // // 中央の光から遠ざかる、または近づくランダムな力を加える
+                const dx = this.centerX - this.x;
+                const dy = this.centerY - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                // // 距離に応じて移動の方向を微調整
+                const force = distance < this.centerRadius * 2 ? 0.005 : -0.001;
+                this.velocity.x += dx * force;
+                this.velocity.y += dy * force;
+
+
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+
+                // 境界から出たら反対側から出現させる（ループ）
+                if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) {
+                    this.reset();
+                }
+
+                // 透明度の点滅（輝き）
+                if (this.fadingIn) {
+                    this.alpha += this.fadeSpeed;
+                    if (this.alpha > 1) {
+                        this.alpha = 1;
+                        this.fadingIn = false;
+                    }
+                } else {
+                    this.alpha -= this.fadeSpeed;
+                    if (this.alpha < 0) {
+                        this.alpha = 0;
+                        this.fadingIn = true;
+                    }
+                }
+                //this.color = `rgba(255, 255, 255, ${this.alpha * 0.7 + 0.3})`; // 最低透明度を0.3に設定
+            }
+
+            // 粒子のリセット
+            reset() {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * W / 2;
+                this.x = this.centerX + Math.cos(angle) * dist;
+                this.y = this.centerY + Math.sin(angle) * dist;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 0.5,
+                    y: (Math.random() - 0.5) * 0.5
+                };
+            }
+
+            // 粒子の描画
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 5; // 粒子の周りにぼかしを追加
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.shadowBlur = 0; // 他の描画に影響を与えないようリセット
+            }
+        }
+
+        /**
+         * 粒子の初期化
+         */
+        function initParticles() {
+            particles = [];
+          const colors = [ "blue", "red", "green", "orange" ];
+          const dW = Math.floor( W / 10);
+          const dH = Math.floor( W / 10);
+          for( let i = 0; i < 4; i++ ) {
+            const centerX = dW + dW * Math.round( Math.random() * 8 );
+            const centerY = dH + dH * Math.round( Math.random() * 8 );
+            for (let j = 0; j < PARTICLE_COUNT; j++) {
+                particles.push(new Particle( centerX, centerY, colors[i] ));
+            }
+          }
+        }
+
+        /**
+         * 中心に光る円を描画
+         */
+        function drawCenterGlow() {
+          for( let i = 2; i < 5; i++ ) {
+            const centerX = W / i;
+            const centerY = H / i;
+
+            // 1. グラデーションによる中心のぼかし光
+            const gradient = ctx.createRadialGradient(
+                centerX, centerY, 0,
+                centerX, centerY, CENTER_RADIUS * 2
+            );
+            gradient.addColorStop(0, CENTER_COLOR); // 中央は強く
+            gradient.addColorStop(0.5, 'rgba(100, 100, 255, 0.2)'); // 周辺は青みがかった光
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // 外側は透明
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, W, H);
+
+            // 2. 中心円の描画
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, CENTER_RADIUS, 0, Math.PI * 2, false);
+
+            // 強いシャドウ（光の拡散）
+            ctx.shadowBlur = 30;
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.fill();
+
+            ctx.shadowBlur = 0; // リセット
+          }
+        }
+
+        /**
+         * アニメーションループ
+         */
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // 背景をわずかに透明にして上書きすることで、古い描画を薄く残し「残像」効果を出す
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, W, H);
+
+            // 中心円の描画
+            //drawCenterGlow();
+
+            // 粒子の更新と描画
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+        }
+
+        // --- 初期化 ---
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initParticles(); // サイズ変更時に粒子の位置をリセット
+        });
+
+        // ページロード時に実行
+        window.onload = () => {
+            resizeCanvas();
+            initParticles();
+            animate();
+        };
+
+    </script>
+</body>
+</html>
+

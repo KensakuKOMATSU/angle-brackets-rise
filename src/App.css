@@ -1,38 +1,59 @@
 .App {
   text-align: center;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.App main .header {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  color: pink;
+  z-index: 1001;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.App main .header h1 {
+  font-family: "Gill Sans", sans-serif;
 }
 
-.App-header {
+.App main {
+  position: absolute;
+  left:0; top: 0; bottom: 0; right:0;
   background-color: #282c34;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.App main .lyric {
+  position: absolute;
+  left:0; top: 0; bottom: 0; right:0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 5em;
+  font-family: "Gill Sans", sans-serif;
+  padding: 50px;
+  z-index: 100;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.App main .audio-visualize {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  bottom: 0;
+  z-index: 10;
+  background-color: #999;
+}
+
+.App main .media-controller {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1002;
 }

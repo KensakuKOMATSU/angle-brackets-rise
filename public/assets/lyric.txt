@@ -1,0 +1,52 @@
+<ANGLE BRACKETS RISE/> 〜 Welcome W3C TPAC 2025 to KOBE 〜
+
+“User agent, that’s you *W3C*... Cache cleared.
+The response is…  200 OK.”
+
+We set the ground so no one slips,
+no hidden doors, no secret scripts.
+Raise every voice, let daylight in—
+we shape the rules that let all begin.
+From tiny tags, living *Hypertext* takes the floor,
+we build a bridge from shore to shore.
+
+Hands up high like promises resolved by night,
+we write it once and make it work just right.
+Across the world, across each screen,
+one shared language, strong and clean.
+
+You’re my Grid, I’m your Flex (It's *CSS*) —locked in time,
+Mind the gap; we find the perfect rhyme.
+But more than code, it’s hearts in tune—
+a common path beneath one moon.
+We choose the words that welcome all,
+big or small, whatever you call.
+Keep it fair, keep it kind,
+trust by design, with peace of mind.
+
+Raise the banner high—we meet and we align,
+Write it in the open, let our edges intertwine.
+Across the sites, across the night,
+*One open WEB*—we build it right.
+
+*WebRTC* sparks, all cameras ignite,
+*WebGPU* riffs, shaders bite.
+*Fetch* that hope, keep *Cookies same-site*,
+privacy by design—Secure, *Http-only* tight.
+*Cross-origin* only with care;
+permissions prompt—be wise, be fair.
+
+Roll out with a shout—*let async*; don’t *await*.
+One open future—we won’t make it wait,
+From meeting rooms to city light,
+we sign our names to do what’s right.
+
+Every voice we raised became one song,
+Thread by thread, we weave a shining *NET*;
+Lift up your eyes—the curtains soaring high,
+With you, we can change the world.
+
+— Welcome to KOBE.
+Ready, set?
+
+Let’s discuss our Web future.
