@@ -555,7 +555,7 @@ NOTE Initial state of LIGHTING
     }
 }
 
-00:03:05.000 --> 00:03:10.000
+00:03:05.000 --> 00:03:07.500
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
@@ -563,11 +563,34 @@ NOTE Initial state of LIGHTING
     }
 }
 
-00:03:10.000 --> 00:03:13.750
+00:03:07.500 --> 00:03:11.000
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 150, "tilt": 72, "dimmer": 160, "color": "rgb( 255, 255, 0 )" }
+        { "pan": 150, "tilt": 72, "dimmer": 30, "color": "rgb( 255, 255, 0 )" }
     }
 }
-    
+
+00:03:11.000 --> 00:03:12.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 20, "color": "rgb( 255, 255, 0 )" }
+    }
+}
+
+00:03:12.000 --> 00:03:13.000
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 15, "color": "rgb( 255, 0, 0 )" }
+    }
+}
+
+00:03:13.000 --> 00:03:13.750
+{
+    "sync":
+    { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
+        { "pan": 150, "tilt": 72, "dimmer": 12, "color": "rgb( 0, 0, 255 )" }
+    }
+}
