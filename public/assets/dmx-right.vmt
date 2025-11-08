@@ -567,7 +567,7 @@ NOTE Initial state of LIGHTING
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 150, "tilt": 72, "dimmer": 30, "color": "rgb( 255, 255, 0 )" }
+        { "pan": 150, "tilt": 72, "dimmer": 30, "color": "rgb( 0, 0, 255 )" }
     }
 }
 
@@ -575,7 +575,7 @@ NOTE Initial state of LIGHTING
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 150, "tilt": 72, "dimmer": 20, "color": "rgb( 255, 255, 0 )" }
+        { "pan": 150, "tilt": 72, "dimmer": 30, "color": "rgb( 0, 0, 128 )" }
     }
 }
 
@@ -583,7 +583,7 @@ NOTE Initial state of LIGHTING
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 150, "tilt": 72, "dimmer": 15, "color": "rgb( 255, 0, 0 )" }
+        { "pan": 150, "tilt": 102, "dimmer": 30, "color": "rgb( 0, 0, 128 )" }
     }
 }
 
@@ -591,6 +591,6 @@ NOTE Initial state of LIGHTING
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 150, "tilt": 72, "dimmer": 12, "color": "rgb( 0, 0, 255 )" }
+        { "pan": 150, "tilt": 128, "dimmer": 30, "color": "rgb( 0, 0, 128 )" }
     }
 }
