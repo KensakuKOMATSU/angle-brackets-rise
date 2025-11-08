@@ -376,7 +376,7 @@ color: "rgb(0, 0, 0)"
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 150, "tilt": 30 , "dimmer": 160, "color": "rgb( 255, 255, 255 )" }
+        { "pan": 150, "tilt": 30 , "dimmer": 0, "color": "rgb( 128, 128, 0 )" }
     }
 }
 
@@ -536,7 +536,7 @@ color: "rgb(0, 0, 0)"
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 192, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+        { "pan": 192, "tilt": 30, "dimmer": 160, "color": "rgb( 255, 255, 0 )" }
     }
 }
 
@@ -544,7 +544,7 @@ color: "rgb(0, 0, 0)"
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+        { "pan": 150, "tilt": 72, "dimmer": 160, "color": "rgb( 255, 255, 0 )" }
     }
 }
 
@@ -552,7 +552,7 @@ color: "rgb(0, 0, 0)"
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 192, "tilt": 30, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+        { "pan": 192, "tilt": 30, "dimmer": 160, "color": "rgb( 255, 255, 0 )" }
     }
 }
 
@@ -560,7 +560,7 @@ color: "rgb(0, 0, 0)"
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 150, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+        { "pan": 150, "tilt": 72, "dimmer": 160, "color": "rgb( 255, 255, 0 )" }
     }
 }
 
@@ -568,6 +568,6 @@ color: "rgb(0, 0, 0)"
 {
     "sync":
     { "type": "org.webvmt.example.lighting", "id": "light1", "data": 
-        { "pan": 192, "tilt": 72, "dimmer": 255, "color": "rgb( 255, 255, 0 )" }
+        { "pan": 192, "tilt": 72, "dimmer": 160, "color": "rgb( 255, 255, 0 )" }
     }
 }
