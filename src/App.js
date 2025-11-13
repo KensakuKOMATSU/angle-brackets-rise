@@ -19,7 +19,7 @@ function App() {
   const _starsLeftRef = useRef()
   const _starsRightRef = useRef()
   const _dmxRef = useRef(null)
-  
+
   const [ _isVideoPlayed, setIsVideoPlayed ] = useState(false);
   const [ _isSwitchToggled, setIsSwitchToggled ] = useState(false);
 
@@ -98,7 +98,7 @@ const _setOnCueChangeEventForVMT = useCallback(() => {
       };
 
       ( async () => {
-        // set loadVmtFiles & 
+        // set loadVmtFiles &
         await window._loadVmtFiles();
         _setOnCueChangeEventForVMT();
       })();
@@ -113,7 +113,7 @@ const _setOnCueChangeEventForVMT = useCallback(() => {
             <h1>Angle Brackets Rise</h1>
           </div>
           <div className="media-controller">
-            <video style={{width: "50vw", visibility: 'hidden'}} controls ref={_videoRef}>
+            <video loop style={{width: "50vw", visibility: 'hidden'}} controls ref={_videoRef}>
               <source src="/assets/angle_brackets_rise.m4a" type="audio/mpeg" />
               <track ref={_trackRef} src="/assets/lyric.vtt" kind="subtitles" srcLang="en" label="English" default />
               <track src="/assets/dmx-left.vmt" kind="metadata" for="left" default/>
@@ -121,8 +121,8 @@ const _setOnCueChangeEventForVMT = useCallback(() => {
             </video>
           </div>
           <div className='dashboard'>
-            <Button 
-              type="primary" 
+            <Button
+              type="primary"
               danger={_isVideoPlayed}
               onClick={ async () => {
                 if( _videoRef.current.paused ) {
@@ -133,10 +133,10 @@ const _setOnCueChangeEventForVMT = useCallback(() => {
               }}>
                 { !_isVideoPlayed ? "Play music" : "Pause music" }
               </Button><br/>
-            <Switch 
-              checkedChildren="DMX On" 
+            <Switch
+              checkedChildren="DMX On"
               checked={_isSwitchToggled}
-              unCheckedChildren="DMX Off" 
+              unCheckedChildren="DMX Off"
               onChange={ async ( checked ) => {
                 console.log('DMX Switch', checked );
                 if( !_dmxRef.current ) {
@@ -166,10 +166,10 @@ const _setOnCueChangeEventForVMT = useCallback(() => {
                 }
               }}
             />
-            <Switch 
+            <Switch
               style={{ marginLeft: '10px' }}
-              checkedChildren="video controller On" 
-              unCheckedChildren="video controller Off" 
+              checkedChildren="video controller On"
+              unCheckedChildren="video controller Off"
               onChange={ ( checked ) => {
                 if( checked ) {
                   _videoRef.current.style.visibility = 'visible';
