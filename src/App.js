@@ -116,8 +116,8 @@ const _setOnCueChangeEventForVMT = useCallback(() => {
             <video loop style={{width: "50vw", visibility: 'hidden'}} controls ref={_videoRef}>
               <source src="/assets/angle_brackets_rise.m4a" type="audio/mpeg" />
               <track ref={_trackRef} src="/assets/lyric.vtt" kind="subtitles" srcLang="en" label="English" default />
-              <track src="/assets/dmx-left.vmt" kind="metadata" for="left" default/>
-              <track src="/assets/dmx-right.vmt" kind="metadata" for="right" default/>
+              <track src="/assets/dmx-left.vmt" kind="metadata" htmlFor="left" default/>
+              <track src="/assets/dmx-right.vmt" kind="metadata" htmlFor="right" default/>
             </video>
           </div>
           <div className='dashboard'>
