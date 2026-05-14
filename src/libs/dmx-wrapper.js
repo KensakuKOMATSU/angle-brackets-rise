@@ -73,6 +73,10 @@ export default class DMXWrapper {
 
     async connect() {
         try {
+            // navigator.serial.getPorts().then( ports => {
+                // console.log( ports )
+            // })
+            //return;
             if( !this.supported ) {
                 throw new Error("WebUSB is not supported in this browser.");
             }

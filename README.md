@@ -12,6 +12,7 @@ My current activity is to apply lighting device control signal in it. For exampl
 * https://song4kobedevmeetup.netlify.app/
 
 > please note that only ENTTEC DMX USB PRO is supported. Most cases, you need to change dmx setting as well.
+> In windows environment, driver for the device MUST be WinUSB. `Zadig` will convenient for change driver ( use  [Options] -> [list All Devices] then choose your target device. After that, click [Reinstall Driver]. )
 
 ---
 &copy; Kensaku Komatsu.
