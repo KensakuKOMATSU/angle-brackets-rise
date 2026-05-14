@@ -2,7 +2,7 @@
 
 Web based time aligment synchronization demo for media and lighting device.
 
-This demo is for special song, Angle Brackets Rise, which was for 'Kobe Developer Meetup' - related event of TPAC 2025 in Kobe.
+This demo is for special song, `Angle Brackets Rise`, which was for 'Kobe Developer Meetup' - related event of TPAC 2025 in Kobe.
 
 In this demonstration, I'm using WebVMT/DataCue API extension for WebVTT which is under propsing state in WICG, W3C.
 My current activity is to apply lighting device control signal in it. For example, DMX device.
@@ -11,8 +11,8 @@ My current activity is to apply lighting device control signal in it. For exampl
 
 * https://song4kobedevmeetup.netlify.app/
 
-> please note that only ENTTEC DMX USB PRO is supported. Most cases, you need to change dmx setting as well.
-> In windows environment, driver for the device MUST be WinUSB. `Zadig` will convenient for change driver ( use  [Options] -> [list All Devices] then choose your target device. After that, click [Reinstall Driver]. )
+> please note that only ENTTEC DMX USB PRO is supported. Most cases, you need to change dmx setting as well. ( do not use WinUSB driver for windows )
+> This demo uses Web Serial API which means chrome and edge is now suppoted.
 
 ---
 &copy; Kensaku Komatsu.
