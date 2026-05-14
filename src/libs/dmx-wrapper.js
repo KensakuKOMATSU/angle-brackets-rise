@@ -77,6 +77,7 @@ export default class DMXWrapper {
                 throw new Error("WebUSB is not supported in this browser.");
             }
             this._device = await navigator.usb.requestDevice({ filters: this._filters });
+            console.log("Selected device:", this._device);
             await this._device.open();
             const configurationValue = this._device.configuration ? this._device.configuration.configurationValue : 1;
             await this._device.selectConfiguration(configurationValue);
