@@ -1,3 +1,5 @@
+// DMXWrapper class for managing DMX communication with ENTTEC DMX USB Pro using Web Serial API
+
 const ENTTEC_PRO_DMX_STARTCODE = 0x00
 const ENTTEC_PRO_START_OF_MSG = 0x7e
 const ENTTEC_PRO_END_OF_MSG = 0xe7
@@ -8,7 +10,7 @@ const UNIVERSE_LENGTH = 513
 const lengthLSB = UNIVERSE_LENGTH & 0xff;          // 下位8ビット (Least Significant Byte)
 const lengthMSB = (UNIVERSE_LENGTH >> 8) & 0xff;   // 上位8ビット (Most Significant Byte)
 
-// ヘッダー部分を Uint8Array で定義
+//ヘッダー部分を Uint8Array で定義
 const HEADER = new Uint8Array([
     ENTTEC_PRO_START_OF_MSG,
     ENTTEC_PRO_SEND_DMX_RQ,
@@ -23,6 +25,9 @@ const STATUS = {
     IDLE: 'idle',
     CONNECTED: 'connected',
 };
+
+const PRODUCT_ID = 24_577; // Product ID for ENTTEC DMX USB Pro
+const VENDOR_ID = 1_027;   // Vendor ID for ENTTEC
 
 /**
  * 複数の Uint8Array を結合する
@@ -49,15 +54,10 @@ function concatUint8Arrays(arrays) {
 
 export default class DMXWrapper {
     _device = null;
-    _filters = [{ vendorId: 1027 }]; // ENTTECのベンダーID
-    _interfaceNumber = 0;
-    _endpointNumber = 2;
     _dmxArray = new Uint8Array(UNIVERSE_LENGTH - 1); // DMXデータ部分（512バイト）
     _status = STATUS.IDLE;
+    _writer = null;
     _timer;
-
-    //constructor() {
-    //}
 
     get status() {
         return this._status;
@@ -67,27 +67,48 @@ export default class DMXWrapper {
         return this._status === STATUS.CONNECTED;
     }
 
+    // check if Web Serial API is supported
     get supported() {
-        return !!navigator.usb;
+        return !!navigator.serial;
     }
+
+    async connectToDMX() {
+        try {
+            const ports = await navigator.serial.getPorts();
+            if (ports.length > 0) {
+                const _port = ports.find( port => port.getInfo().usbVendorId === VENDOR_ID && port.getInfo().usbProductId === PRODUCT_ID );
+                if( _port ) {
+                    console.log("Found existing port:", _port);
+                    return _port;
+                } else {
+                    console.warn("No existing ENTTEC DMX USB Pro port found. Prompting user to select a port.");
+                }
+            } 
+
+            const port = await navigator.serial.requestPort();
+            if( port.getInfo().usbVendorId === VENDOR_ID && port.getInfo().usbProductId === PRODUCT_ID ) {
+                console.log("Selected port:", port);
+                return port;
+            } else {
+                throw new Error("Selected device is not an ENTTEC DMX USB Pro.");
+            }
+        } catch (err) {
+            throw err;
+        }
+    };
 
     async connect() {
         try {
-            // navigator.serial.getPorts().then( ports => {
-                // console.log( ports )
-            // })
-            //return;
+            const port = await this.connectToDMX();
+
+            await port.open({ baudRate: 250_000, stopBits: 2, dataBits: 8, parity: 'none' });
+            this._writer = port.writable.getWriter();
+            this._device = port;
+
             if( !this.supported ) {
                 throw new Error("WebUSB is not supported in this browser.");
             }
-            this._device = await navigator.usb.requestDevice({ filters: this._filters });
-            console.log("Selected device:", this._device);
-            await this._device.open();
-            const configurationValue = this._device.configuration ? this._device.configuration.configurationValue : 1;
-            await this._device.selectConfiguration(configurationValue);
-            await this._device.claimInterface(this._interfaceNumber);
-            const out = this._device.configuration.interfaces[0].alternate.endpoints.find( item => item.direction === 'out' );
-            this._endpointNumber = out.endpointNumber;
+
 
             // initialize DMX data to zeros
             this.send();
@@ -108,7 +129,7 @@ export default class DMXWrapper {
     }
 
     async disconnect() {
-        if (this._device && this._device.opened) {
+        if (this._device || ( this._device.opened || this._device.connected ) ) {
             // Stop the periodic sending of DMX data
             if( this._timer ) {
                 clearInterval(this._timer);
@@ -118,7 +139,9 @@ export default class DMXWrapper {
             // reset DMX data to zeros before disconnecting
             this.clear();
             await this.send();
+            await this._writer.releaseLock();
             await this._device.close();
+            this._writer = null;
             this._device = null;
             this._status = STATUS.IDLE;
         }
@@ -146,13 +169,14 @@ export default class DMXWrapper {
      * @param {object} dmxData  - e.g. {1: 255, 2: 128, ...}
      */
     async send() {
-        if (!this._device || !this._device.opened) {
+        if (!this._device || !( this._device.opened || this._device.connected ) ) {
             throw new Error("Device is not connected");
         }
 
         try {
             const dataToSend = concatUint8Arrays([HEADER, this._dmxArray, END_BYTE]);
-            await this._device.transferOut(this._endpointNumber, dataToSend);
+            await this._writer.ready;
+            await this._writer.write(dataToSend);
             return this._dmxArray;
         } catch (err) {
             throw err;
