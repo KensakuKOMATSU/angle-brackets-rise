@@ -7,5 +7,11 @@ This demo is for special song, Angle Brackets Rise, which was for 'Kobe Develope
 In this demonstration, I'm using WebVMT/DataCue API extension for WebVTT which is under propsing state in WICG, W3C.
 My current activity is to apply lighting device control signal in it. For example, DMX device.
 
+## demo
+
+* https://song4kobedevmeetup.netlify.app/
+
+> please note that only ENTTEC DMX USB PRO is supported. Most cases, you need to change dmx setting as well.
+
 ---
 &copy; Kensaku Komatsu.
