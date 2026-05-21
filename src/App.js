@@ -69,8 +69,8 @@ function App() {
               _starsRightRef.current.setColor(defaultColor);
             }
             if (_dmxRef.current && _dmxRef.current.connected) {
-              _dmxRef.current.clear();
-              await _dmxRef.current.send();
+              // _dmxRef.current.clear();
+              // await _dmxRef.current.send();
             }
           }
         });
