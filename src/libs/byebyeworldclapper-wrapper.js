@@ -181,38 +181,6 @@ export default class ByebyeworldWrapper {
 
     this._log("[Robot] Attempting to connect to serial port...");
     const selectedFilters = filters ?? this._filters;
-    const hasSelectedFilters = Array.isArray(selectedFilters) && selectedFilters.length > 0;
-    const candidates = [];
-
-    const matchesFilters = (port) => {
-      if (!selectedFilters || selectedFilters.length === 0) {
-        return true;
-      }
-      const info = port.getInfo();
-      return selectedFilters.some((filter) => {
-        const vendorMatches =
-          filter.usbVendorId == null || info.usbVendorId === filter.usbVendorId;
-        const productMatches =
-          filter.usbProductId == null || info.usbProductId === filter.usbProductId;
-        return vendorMatches && productMatches;
-      });
-    };
-
-    if (candidates.length === 0 && allowPrompt) {
-      candidates.push(
-        await this._selectPort({
-          allowPrompt: true,
-          filters: selectedFilters,
-          excludePortInfos,
-        })
-      );
-    }
-
-    if (candidates.length === 0) {
-      throw new Error("no previously granted serial ports");
-    }
-
-    let lastError = null;
     const tryOpenPort = async (port) => {
       if (this._isExcludedPort(port, excludePortInfos)) {
         throw new Error("Skipping excluded serial port");
@@ -225,34 +193,38 @@ export default class ByebyeworldWrapper {
       this._status = SERIAL_STATUS.CONNECTED;
     };
 
-    for (const port of candidates) {
+    const maxPromptAttempts = allowPrompt ? 3 : 1;
+    let lastError = null;
+
+    for (let attempt = 0; attempt < maxPromptAttempts; attempt += 1) {
+      let port;
+      try {
+        port = await this._selectPort({
+          allowPrompt,
+          filters: selectedFilters,
+          excludePortInfos,
+        });
+      } catch (error) {
+        lastError = error;
+        break;
+      }
+
       try {
         await tryOpenPort(port);
         this._log("[Robot] Connected to Robot Serial port:", port);
         return;
       } catch (error) {
-        if (isPortAlreadyOpenError(error)) {
-          this._warn("[Robot] Skipping already-open serial port:", port);
-          lastError = error;
+        lastError = error;
+        if (isPortAlreadyOpenError(error) && attempt < maxPromptAttempts - 1) {
+          this._warn("[Robot] Selected port is busy. Please choose another port.");
           continue;
         }
-        lastError = error;
+        break;
       }
     }
 
-    if (allowPrompt) {
-      try {
-        const promptedPort = await navigator.serial.requestPort(
-          selectedFilters && selectedFilters.length > 0 ? { filters: selectedFilters } : undefined
-        );
-        if (this._isExcludedPort(promptedPort, excludePortInfos)) {
-          throw new Error("Selected port is already used by another serial connection");
-        }
-        await tryOpenPort(promptedPort);
-        return;
-      } catch (error) {
-        lastError = error;
-      }
+    if (isPortAlreadyOpenError(lastError)) {
+      throw new Error("Selected port is already in use by another connection. Choose the other serial device.");
     }
 
     throw withConnectionContext(lastError || new Error("serial connection failed"), this._connectionOptions);
