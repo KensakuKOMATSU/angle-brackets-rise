@@ -15,6 +15,13 @@ const DEFAULT_CONNECTION_OPTIONS = {
 
 const DEFAULT_LINE_ENDING = "lf";
 
+function toPortInfoKey(info) {
+  if (!info || (info.usbVendorId == null && info.usbProductId == null)) {
+    return null;
+  }
+  return `${info.usbVendorId ?? "*"}:${info.usbProductId ?? "*"}`;
+}
+
 function normalizeError(error) {
   if (error instanceof Error) {
     return error;
@@ -85,6 +92,10 @@ export default class ByebyeworldWrapper {
     return this._lineEnding;
   }
 
+  get portInfo() {
+    return this._port?.getInfo?.() ?? null;
+  }
+
   setConnectionOptions(connectionOptions = {}) {
     const nextBaudRate = Math.max(
       1200,
@@ -127,31 +138,22 @@ export default class ByebyeworldWrapper {
     return lineEnding === "crlf" ? "\r\n" : lineEnding === "lf" ? "\n" : "";
   }
 
-  async _selectPort({ allowPrompt = true, filters } = {}) {
-    if (!this.supported) {
-      throw new Error("Web Serial API is not supported in this browser");
+  _isExcludedPort(port, excludePortInfos = []) {
+    if (!Array.isArray(excludePortInfos) || excludePortInfos.length === 0) {
+      return false;
     }
 
-    const ports = await navigator.serial.getPorts();
-    if (ports.length > 0) {
-      if (!filters || filters.length === 0) {
-        return ports[0];
-      }
+    const portKey = toPortInfoKey(port?.getInfo?.());
+    if (!portKey) {
+      return false;
+    }
 
-      const matchedPort = ports.find((port) => {
-        const info = port.getInfo();
-        return filters.some((filter) => {
-          const vendorMatches =
-            filter.usbVendorId == null || info.usbVendorId === filter.usbVendorId;
-          const productMatches =
-            filter.usbProductId == null || info.usbProductId === filter.usbProductId;
-          return vendorMatches && productMatches;
-        });
-      });
+    return excludePortInfos.some((info) => toPortInfoKey(info) === portKey);
+  }
 
-      if (matchedPort) {
-        return matchedPort;
-      }
+  async _selectPort({ allowPrompt = true, filters, excludePortInfos = [] } = {}) {
+    if (!this.supported) {
+      throw new Error("Web Serial API is not supported in this browser");
     }
 
     if (!allowPrompt) {
@@ -159,47 +161,31 @@ export default class ByebyeworldWrapper {
     }
 
     if (filters && filters.length > 0) {
-      return navigator.serial.requestPort({ filters });
+      const port = await navigator.serial.requestPort({ filters });
+      if (this._isExcludedPort(port, excludePortInfos)) {
+        throw new Error("Selected port is already used by another serial connection");
+      }
+      return port;
     }
-    return navigator.serial.requestPort();
+    const port = await navigator.serial.requestPort();
+    if (this._isExcludedPort(port, excludePortInfos)) {
+      throw new Error("Selected port is already used by another serial connection");
+    }
+    return port;
   }
 
-  async connect({ allowPrompt = true, filters } = {}) {
+  async connect({ allowPrompt = true, filters, excludePortInfos = [] } = {}) {
+    if (this.connected) {
+      return;
+    }
+
     this._log("[Robot] Attempting to connect to serial port...");
     const selectedFilters = filters ?? this._filters;
-    const ports = await navigator.serial.getPorts();
-    const candidates = [];
-
-    const matchesFilters = (port) => {
-      if (!selectedFilters || selectedFilters.length === 0) {
-        return true;
-      }
-      const info = port.getInfo();
-      return selectedFilters.some((filter) => {
-        const vendorMatches =
-          filter.usbVendorId == null || info.usbVendorId === filter.usbVendorId;
-        const productMatches =
-          filter.usbProductId == null || info.usbProductId === filter.usbProductId;
-        return vendorMatches && productMatches;
-      });
-    };
-
-    for (const port of ports) {
-      if (matchesFilters(port)) {
-        candidates.push(port);
-      }
-    }
-
-    if (candidates.length === 0 && allowPrompt) {
-      candidates.push(await this._selectPort({ allowPrompt: true, filters: selectedFilters }));
-    }
-
-    if (candidates.length === 0) {
-      throw new Error("no previously granted serial ports");
-    }
-
-    let lastError = null;
     const tryOpenPort = async (port) => {
+      if (this._isExcludedPort(port, excludePortInfos)) {
+        throw new Error("Skipping excluded serial port");
+      }
+
       await port.open(this._connectionOptions);
 
       this._port = port;
@@ -207,33 +193,38 @@ export default class ByebyeworldWrapper {
       this._status = SERIAL_STATUS.CONNECTED;
     };
 
-    for (const port of candidates) {
+    const maxPromptAttempts = allowPrompt ? 3 : 1;
+    let lastError = null;
+
+    for (let attempt = 0; attempt < maxPromptAttempts; attempt += 1) {
+      let port;
+      try {
+        port = await this._selectPort({
+          allowPrompt,
+          filters: selectedFilters,
+          excludePortInfos,
+        });
+      } catch (error) {
+        lastError = error;
+        break;
+      }
+
       try {
         await tryOpenPort(port);
         this._log("[Robot] Connected to Robot Serial port:", port);
         return;
       } catch (error) {
-        if (isPortAlreadyOpenError(error)) {
-          this._port = port;
-          this._writer = port.writable.getWriter();
-          this._status = SERIAL_STATUS.CONNECTED;
-          this._log("[Robot] Connected to Robot Serial port:", port);
-          return;
-        }
         lastError = error;
+        if (isPortAlreadyOpenError(error) && attempt < maxPromptAttempts - 1) {
+          this._warn("[Robot] Selected port is busy. Please choose another port.");
+          continue;
+        }
+        break;
       }
     }
 
-    if (allowPrompt) {
-      try {
-        const promptedPort = await navigator.serial.requestPort(
-          selectedFilters && selectedFilters.length > 0 ? { filters: selectedFilters } : undefined
-        );
-        await tryOpenPort(promptedPort);
-        return;
-      } catch (error) {
-        lastError = error;
-      }
+    if (isPortAlreadyOpenError(lastError)) {
+      throw new Error("Selected port is already in use by another connection. Choose the other serial device.");
     }
 
     throw withConnectionContext(lastError || new Error("serial connection failed"), this._connectionOptions);

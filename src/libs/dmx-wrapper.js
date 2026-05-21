@@ -58,6 +58,7 @@ export default class DMXWrapper {
     _status = STATUS.IDLE;
     _writer = null;
     _timer;
+    _autoSelectGrantedPorts = false;
 
     get status() {
         return this._status;
@@ -72,18 +73,24 @@ export default class DMXWrapper {
         return !!navigator.serial;
     }
 
+    setAutoSelectGrantedPorts(enabled = false) {
+        this._autoSelectGrantedPorts = Boolean(enabled);
+    }
+
     async connectToDMX() {
         try {
-            const ports = await navigator.serial.getPorts();
-            if (ports.length > 0) {
-                const _port = ports.find( port => port.getInfo().usbVendorId === VENDOR_ID && port.getInfo().usbProductId === PRODUCT_ID );
-                if( _port ) {
-                    console.log("Found existing port:", _port);
-                    return _port;
-                } else {
-                    console.warn("No existing ENTTEC DMX USB Pro port found. Prompting user to select a port.");
+            if (this._autoSelectGrantedPorts) {
+                const ports = await navigator.serial.getPorts();
+                if (ports.length > 0) {
+                    const _port = ports.find( port => port.getInfo().usbVendorId === VENDOR_ID && port.getInfo().usbProductId === PRODUCT_ID );
+                    if( _port ) {
+                        console.log("Found existing port:", _port);
+                        return _port;
+                    } else {
+                        console.warn("No existing ENTTEC DMX USB Pro port found. Prompting user to select a port.");
+                    }
                 }
-            } 
+            }
 
             const port = await navigator.serial.requestPort();
             if( port.getInfo().usbVendorId === VENDOR_ID && port.getInfo().usbProductId === PRODUCT_ID ) {
