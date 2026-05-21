@@ -12,8 +12,8 @@ NOTE EYE
 00:00:00.000 --> 00:00:10.700
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_eye",
     "data": {
       "action": "eye_off"
     }
@@ -23,8 +23,8 @@ NOTE EYE
 00:00:10.700 --> 00:03:17.120
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_eye",
     "data": {
       "action": "eye_on"
     }

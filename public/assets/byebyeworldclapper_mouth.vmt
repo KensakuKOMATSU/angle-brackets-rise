@@ -12,8 +12,8 @@ NOTE MOUTH
 00:00:00.700 --> 00:00:00.800
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -23,8 +23,8 @@ NOTE MOUTH
 00:00:00.900 --> 00:00:01.000
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -34,8 +34,8 @@ NOTE MOUTH
 00:00:02.000 --> 00:00:02.100
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -45,8 +45,8 @@ NOTE MOUTH
 00:00:02.200 --> 00:00:02.300
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -56,8 +56,8 @@ NOTE MOUTH
 00:00:02.300 --> 00:00:02.400
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -67,8 +67,8 @@ NOTE MOUTH
 00:00:02.400 --> 00:00:02.500
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -78,8 +78,8 @@ NOTE MOUTH
 00:00:02.500 --> 00:00:02.600
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -89,8 +89,8 @@ NOTE MOUTH
 00:00:02.800 --> 00:00:02.900
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -100,8 +100,8 @@ NOTE MOUTH
 00:00:02.900 --> 00:00:03.000
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -111,8 +111,8 @@ NOTE MOUTH
 00:00:03.100 --> 00:00:03.200
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -122,8 +122,8 @@ NOTE MOUTH
 00:00:05.100 --> 00:00:05.200
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -133,8 +133,8 @@ NOTE MOUTH
 00:00:05.200 --> 00:00:05.300
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -144,8 +144,8 @@ NOTE MOUTH
 00:00:05.300 --> 00:00:05.400
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -155,8 +155,8 @@ NOTE MOUTH
 00:00:05.400 --> 00:00:05.500
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -166,8 +166,8 @@ NOTE MOUTH
 00:00:05.800 --> 00:00:05.900
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -177,8 +177,8 @@ NOTE MOUTH
 00:00:05.900 --> 00:00:06.000
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -188,8 +188,8 @@ NOTE MOUTH
 00:00:06.000 --> 00:00:06.100
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -199,8 +199,8 @@ NOTE MOUTH
 00:00:06.100 --> 00:00:06.200
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -210,8 +210,8 @@ NOTE MOUTH
 00:00:06.200 --> 00:00:06.300
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -221,8 +221,8 @@ NOTE MOUTH
 00:00:07.900 --> 00:00:08.000
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -232,8 +232,8 @@ NOTE MOUTH
 00:00:08.100 --> 00:00:08.200
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
@@ -243,8 +243,8 @@ NOTE MOUTH
 00:00:08.300 --> 00:00:08.400
 {
   "sync": {
-    "type": "org.wakasa.byebyeworldclapper",
-    "id": "clapper1",
+    "type": "org.webvmt.example.byebyeworldclapper",
+    "id": "clapper_mouth",
     "data": {
       "action": "mouth_move"
     }
