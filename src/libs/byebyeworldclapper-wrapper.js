@@ -1,4 +1,5 @@
 // ByebyeworldWrapper class for managing generic Web Serial communication
+import device_setting from "../device-setting.json";
 
 const SERIAL_STATUS = {
   IDLE: "idle",
@@ -14,6 +15,9 @@ const DEFAULT_CONNECTION_OPTIONS = {
 };
 
 const DEFAULT_LINE_ENDING = "lf";
+
+const clapper_setting = device_setting.find((d) => d.type === "clapper") || {};
+const DEFAULT_FILTERS = clapper_setting ? clapper_setting.filters : [];
 
 function toPortInfoKey(info) {
   if (!info || (info.usbVendorId == null && info.usbProductId == null)) {
@@ -40,11 +44,7 @@ function withConnectionContext(error, options) {
   const lowered = msg.toLowerCase();
 
   if (lowered.includes("failed to open serial port") || lowered.includes("networkerror")) {
-    return new Error(
-      `Failed to open serial port. Close other apps/tabs using this device and retry. options=${JSON.stringify(
-        options
-      )}`
-    );
+    return new Error(`Failed to open serial port. Close other apps/tabs using this device and retry. options=${JSON.stringify(options)}`);
   }
 
   return normalized;
@@ -69,6 +69,9 @@ export default class ByebyeworldWrapper {
     }
     if (filters) {
       this.setFilters(filters);
+    } else {
+      this.setFilters(DEFAULT_FILTERS);
+      console.log("[Robot] Using default filters:", this._filters);
     }
   }
 
@@ -97,11 +100,7 @@ export default class ByebyeworldWrapper {
   }
 
   setConnectionOptions(connectionOptions = {}) {
-    const nextBaudRate = Math.max(
-      1200,
-      Number(connectionOptions.baudRate ?? this._connectionOptions.baudRate) ||
-        this._connectionOptions.baudRate
-    );
+    const nextBaudRate = Math.max(1200, Number(connectionOptions.baudRate ?? this._connectionOptions.baudRate) || this._connectionOptions.baudRate);
 
     this._connectionOptions = {
       ...this._connectionOptions,
@@ -156,12 +155,34 @@ export default class ByebyeworldWrapper {
       throw new Error("Web Serial API is not supported in this browser");
     }
 
+    const selectedFilters = filters ?? this._filters;
+
+    // 1. setting.jsonで指定しているポート番号と接続しているポートを照合->既に接続許可されているポートがあればそれを使用
+    if (selectedFilters && selectedFilters.length > 0) {
+      const existingPorts = await navigator.serial.getPorts();
+      for (const port of existingPorts) {
+        if (!this._isExcludedPort(port, excludePortInfos)) {
+          const info = port.getInfo();
+          const matches = selectedFilters.some((filter) => {
+            const vendorMatch = filter.usbVendorId == null || filter.usbVendorId === info.usbVendorId;
+            const productMatch = filter.usbProductId == null || filter.usbProductId === info.usbProductId;
+            return vendorMatch && productMatch;
+          });
+          if (matches) {
+            this._log("[Robot] Found previously granted port matching filters:", info);
+            return port;
+          }
+        }
+      }
+    }
+
+    // 2. 既存ポートがない場合、ユーザにプロンプトを表示
     if (!allowPrompt) {
       throw new Error("no previously granted serial ports");
     }
 
-    if (filters && filters.length > 0) {
-      const port = await navigator.serial.requestPort({ filters });
+    if (selectedFilters && selectedFilters.length > 0) {
+      const port = await navigator.serial.requestPort({ filters: selectedFilters });
       if (this._isExcludedPort(port, excludePortInfos)) {
         throw new Error("Selected port is already used by another serial connection");
       }
@@ -245,40 +266,34 @@ export default class ByebyeworldWrapper {
     this._status = SERIAL_STATUS.IDLE;
   }
 
-
   async clap(obj, { lineEnding } = {}) {
     // console.log("[Robot] Sending CLAP action with payload:", obj);
-      await this.sendCommand("clap", obj, { lineEnding });
+    await this.sendCommand("clap", obj, { lineEnding });
   }
-  
+
   async mouth(obj, { lineEnding } = {}) {
     // console.log("[Robot] Sending MOUTH action with payload:", obj);
-      await this.sendCommand("mouth", obj, { lineEnding });
+    await this.sendCommand("mouth", obj, { lineEnding });
   }
 
   async eye(obj, { lineEnding } = {}) {
     // console.log("[Robot] Sending EYE action with payload:", obj);
-      await this.sendCommand("eye", obj, { lineEnding });
+    await this.sendCommand("eye", obj, { lineEnding });
   }
 
   async sendCommand(command, obj, { lineEnding } = {}) {
     this._log(`[Robot] Sending command: ${command} with payload:`, obj);
-    
-      if (!this._writer) {
-        throw new Error("serial not connected");
-      }
 
-      const serialObj =
-        obj && typeof obj === "object"
-          ? { command, ...obj }
-          : { command, value: obj };
+    if (!this._writer) {
+      throw new Error("serial not connected");
+    }
 
-      const ending = this._resolveLineEnding(lineEnding);
-      const payload = `${JSON.stringify(serialObj)}${ending}`;
-      await this._writer.ready;
-      await this._writer.write(this._textEncoder.encode(payload));
-        this._log("[Robot] Serial write completed:", payload);
+    const serialObj = obj && typeof obj === "object" ? { command, ...obj } : { command, value: obj };
+
+    const ending = this._resolveLineEnding(lineEnding);
+    const payload = `${JSON.stringify(serialObj)}${ending}`;
+    await this._writer.ready;
+    await this._writer.write(this._textEncoder.encode(payload));
+    this._log("[Robot] Serial write completed:", payload);
   }
-
-
 }
