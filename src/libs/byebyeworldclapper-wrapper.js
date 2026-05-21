@@ -1,5 +1,4 @@
 // ByebyeworldWrapper class for managing generic Web Serial communication
-import device_setting from "../device-setting.json";
 
 const SERIAL_STATUS = {
   IDLE: "idle",
@@ -15,9 +14,6 @@ const DEFAULT_CONNECTION_OPTIONS = {
 };
 
 const DEFAULT_LINE_ENDING = "lf";
-
-const clapper_setting = device_setting.find((d) => d.type === "clapper") || {};
-const DEFAULT_FILTERS = clapper_setting ? clapper_setting.filters : [];
 
 function toPortInfoKey(info) {
   if (!info || (info.usbVendorId == null && info.usbProductId == null)) {
@@ -69,9 +65,6 @@ export default class ByebyeworldWrapper {
     }
     if (filters) {
       this.setFilters(filters);
-    } else {
-      this.setFilters(DEFAULT_FILTERS);
-      console.log("[Robot] Using default filters:", this._filters);
     }
   }
 
@@ -155,34 +148,12 @@ export default class ByebyeworldWrapper {
       throw new Error("Web Serial API is not supported in this browser");
     }
 
-    const selectedFilters = filters ?? this._filters;
-
-    // 1. setting.jsonで指定しているポート番号と接続しているポートを照合->既に接続許可されているポートがあればそれを使用
-    if (selectedFilters && selectedFilters.length > 0) {
-      const existingPorts = await navigator.serial.getPorts();
-      for (const port of existingPorts) {
-        if (!this._isExcludedPort(port, excludePortInfos)) {
-          const info = port.getInfo();
-          const matches = selectedFilters.some((filter) => {
-            const vendorMatch = filter.usbVendorId == null || filter.usbVendorId === info.usbVendorId;
-            const productMatch = filter.usbProductId == null || filter.usbProductId === info.usbProductId;
-            return vendorMatch && productMatch;
-          });
-          if (matches) {
-            this._log("[Robot] Found previously granted port matching filters:", info);
-            return port;
-          }
-        }
-      }
-    }
-
-    // 2. 既存ポートがない場合、ユーザにプロンプトを表示
     if (!allowPrompt) {
       throw new Error("no previously granted serial ports");
     }
 
-    if (selectedFilters && selectedFilters.length > 0) {
-      const port = await navigator.serial.requestPort({ filters: selectedFilters });
+    if (filters && filters.length > 0) {
+      const port = await navigator.serial.requestPort({ filters });
       if (this._isExcludedPort(port, excludePortInfos)) {
         throw new Error("Selected port is already used by another serial connection");
       }
