@@ -5,6 +5,8 @@ import Stars from "./components/stars";
 import DMXWrapper from "./libs/dmx-wrapper";
 import { datacue2dmx } from "./libs/datacue2dmx";
 
+import ByebyeworldWrapper from "./libs/byebyeworldclapper-wrapper";
+
 import { Switch, Button } from "antd";
 
 import "./App.css";
@@ -53,19 +55,8 @@ function App() {
               }
             } else if (currentCue.type === "org.webvmt.example.byebyeworldclapper") {
               console.log("Current Cue for", forValue, ":", currentCue.value);
-              // _handleRobotRef.current?.[forValue].(); // 例えば、_handleRobotRef.current.clapper()のように呼び出す。これだとif文で分岐しなくてOK
-              if (forValue === "clapper") {
-                // ここでclapを呼び出す
-              } else if (forValue === "eye") {
-                // ここでeyeを呼び出す
-              } else {
-                // case mouth
-                // ここでmouthを呼び出す
-              }
-
-              if (_handleRobotRef.current) {
-                // さらにconnectedの場合
-                // updateする
+              if (_handleRobotRef.current && _handleRobotRef.current.connected) {
+                _handleRobotRef.current?.[forValue]?.(currentCue.value);
               }
             }
           } else {
@@ -133,7 +124,7 @@ function App() {
               <track ref={_trackRef} src="/assets/lyric.vtt" kind="subtitles" srcLang="en" label="English" default />
               <track src="/assets/dmx-left.vmt" kind="metadata" htmlFor="left" default />
               <track src="/assets/dmx-right.vmt" kind="metadata" htmlFor="right" default />
-              <track src="/assets/byebyeworldclapper_clap.vmt" kind="metadata" htmlFor="clapper" default />
+              <track src="/assets/byebyeworldclapper_clap.vmt" kind="metadata" htmlFor="clap" default />
               <track src="/assets/byebyeworldclapper_eye.vmt" kind="metadata" htmlFor="eye" default />
               <track src="/assets/byebyeworldclapper_mouth.vmt" kind="metadata" htmlFor="mouth" default />
             </video>
@@ -160,12 +151,34 @@ function App() {
               onChange={async (checked) => {
                 console.log("Clapper Switch", checked);
 
-                // clapperが接続されていなかったら、新しいインスタンスを作成して接続する
+                if (!_handleRobotRef.current) {
+                  _handleRobotRef.current = new ByebyeworldWrapper();
+                }
 
                 if (checked) {
                   // 接続してから、スイッチをオンにする
+                  await _handleRobotRef.current
+                    .connect()
+                    .then(() => {
+                      setIsClapperOn(true);
+                    })
+                    .catch((err) => {
+                      setIsClapperOn(false);
+                      console.error("Clapper Connection Error:", err);
+                      return;
+                    });
                 } else {
                   // 切断してから、スイッチをオフにする
+                  await _handleRobotRef.current
+                    .disconnect()
+                    .then(() => {
+                      setIsClapperOn(false);
+                    })
+                    .catch((err) => {
+                      setIsClapperOn(true);
+                      console.error("Clapper Disconnection Error:", err);
+                      return;
+                    });
                 }
               }}
             />
