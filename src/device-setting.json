@@ -5,6 +5,6 @@
   },
   {
     "type": "dmx",
-    "filters": [{ "usbVendorId": 1027, "usbProductId": 24578 }]
+    "filters": [{ "usbVendorId": 1027, "usbProductId": 24577 }]
   }
 ]

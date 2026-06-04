@@ -1,5 +1,7 @@
 // DMXWrapper class for managing DMX communication with ENTTEC DMX USB Pro using Web Serial API
 
+import device_setting from "../device-setting.json";
+
 const ENTTEC_PRO_DMX_STARTCODE = 0x00;
 const ENTTEC_PRO_START_OF_MSG = 0x7e;
 const ENTTEC_PRO_END_OF_MSG = 0xe7;
@@ -26,8 +28,8 @@ const STATUS = {
   CONNECTED: "connected",
 };
 
-const PRODUCT_ID = 24_577; // Product ID for ENTTEC DMX USB Pro
-const VENDOR_ID = 1_027; // Vendor ID for ENTTEC
+// const PRODUCT_ID = 24_577; // Product ID for ENTTEC DMX USB Pro
+// const VENDOR_ID = 1_027; // Vendor ID for ENTTEC
 
 /**
  * 複数の Uint8Array を結合する
@@ -75,11 +77,17 @@ export default class DMXWrapper {
   }
 
   async connectToDMX() {
+    const dmx_setting = device_setting.find((f) => f.type === "dmx");
+    if (!dmx_setting) {
+      throw new Error("DMX device filter is not defined in device_setting.json");
+    }
     try {
       if (this._autoSelectGrantedPorts) {
-        const ports = await navigator.serial.getPorts();
+        const ports = await navigator.serial.getPorts({
+          filters: dmx_setting.filters,
+        });
         if (ports.length > 0) {
-          const _port = ports.find((port) => port.getInfo().usbVendorId === VENDOR_ID && port.getInfo().usbProductId === PRODUCT_ID);
+          const _port = ports.find((port) => dmx_setting.filters.some((filter) => port.getInfo().usbVendorId === filter.usbVendorId && port.getInfo().usbProductId === filter.usbProductId));
           if (_port) {
             console.log("Found existing port:", _port);
             return _port;
@@ -89,8 +97,10 @@ export default class DMXWrapper {
         }
       }
 
-      const port = await navigator.serial.requestPort();
-      if (port.getInfo().usbVendorId === VENDOR_ID && port.getInfo().usbProductId === PRODUCT_ID) {
+      const port = await navigator.serial.requestPort({
+        filters: dmx_setting.filters,
+      });
+      if (dmx_setting.filters.some((filter) => port.getInfo().usbVendorId === filter.usbVendorId && port.getInfo().usbProductId === filter.usbProductId)) {
         console.log("Selected port:", port);
         return port;
       } else {

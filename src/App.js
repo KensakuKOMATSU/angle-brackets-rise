@@ -7,6 +7,8 @@ import { datacue2dmx } from "./libs/datacue2dmx";
 
 import ByebyeworldWrapper from "./libs/byebyeworldclapper-wrapper";
 
+import device_setting from "./device-setting.json";
+
 import { Switch, Button } from "antd";
 
 import "./App.css";
@@ -152,7 +154,9 @@ function App() {
                 console.log("Clapper Switch", checked);
 
                 if (!_handleRobotRef.current) {
-                  _handleRobotRef.current = new ByebyeworldWrapper();
+                  _handleRobotRef.current = new ByebyeworldWrapper({
+                    filters: device_setting.find((f) => f.type === "clapper")?.filters,
+                  });
                 }
 
                 if (checked) {
