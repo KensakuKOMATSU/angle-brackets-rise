@@ -92,6 +92,10 @@ export default class ByebyeworldWrapper {
     return this._port?.getInfo?.() ?? null;
   }
 
+  get port() {
+    return this._port;
+  }
+
   setConnectionOptions(connectionOptions = {}) {
     const nextBaudRate = Math.max(1200, Number(connectionOptions.baudRate ?? this._connectionOptions.baudRate) || this._connectionOptions.baudRate);
 
@@ -146,6 +150,12 @@ export default class ByebyeworldWrapper {
   async _selectPort({ allowPrompt = true, filters, excludePortInfos = [] } = {}) {
     if (!this.supported) {
       throw new Error("Web Serial API is not supported in this browser");
+    }
+
+    const grantedPorts = await navigator.serial.getPorts();
+    const availableGrantedPort = grantedPorts.find((port) => !this._isExcludedPort(port, excludePortInfos));
+    if (availableGrantedPort) {
+      return availableGrantedPort;
     }
 
     if (!allowPrompt) {
@@ -224,45 +234,194 @@ export default class ByebyeworldWrapper {
 
   async disconnect() {
     this._log("[Robot] Disconnecting from serial port...");
+    let disconnectError = null;
+
     if (this._writer) {
-      await this._writer.releaseLock();
-      this._writer = null;
+      try {
+        this._writer.releaseLock();
+      } catch (error) {
+        disconnectError = disconnectError || normalizeError(error);
+      } finally {
+        this._writer = null;
+      }
     }
 
     if (this._port) {
-      await this._port.close();
-      this._port = null;
+      try {
+        await this._port.close();
+      } catch (error) {
+        disconnectError = disconnectError || normalizeError(error);
+      } finally {
+        this._port = null;
+      }
     }
 
     this._status = SERIAL_STATUS.IDLE;
+
+    if (disconnectError) {
+      throw disconnectError;
+    }
   }
 
   async clap(obj, { lineEnding } = {}) {
-    // console.log("[Robot] Sending CLAP action with payload:", obj);
-    await this.sendCommand("clap", obj, { lineEnding });
+    await this._sendCommand("clap", obj, { lineEnding });
   }
 
   async mouth(obj, { lineEnding } = {}) {
-    // console.log("[Robot] Sending MOUTH action with payload:", obj);
-    await this.sendCommand("mouth", obj, { lineEnding });
+    await this._sendCommand("mouth", obj, { lineEnding });
   }
 
   async eye(obj, { lineEnding } = {}) {
-    // console.log("[Robot] Sending EYE action with payload:", obj);
-    await this.sendCommand("eye", obj, { lineEnding });
+    await this._sendCommand("eye", obj, { lineEnding });
   }
 
-  async sendCommand(command, obj, { lineEnding } = {}) {
+  _resolveMouthAction(obj) {
+    const raw = typeof obj === "string"
+      ? obj
+      : obj?.action ?? obj?.type ?? obj?.mode ?? "move";
+
+    switch (String(raw).toLowerCase()) {
+      case "move":
+      case "mouth_move":
+        return "mouth_move";
+      case "small":
+      case "mouth_small":
+        return "mouth_small";
+      case "large":
+      case "mouth_large":
+        return "mouth_large";
+      default:
+        break;
+    }
+
+    const normalized = String(raw);
+    if (/^mouth_\d+$/.test(normalized)) {
+      return normalized;
+    }
+
+    throw new Error(`Unsupported mouth action: ${raw}`);
+  }
+
+  _resolveEyeAction(obj) {
+    const raw = typeof obj === "string"
+      ? obj
+      : obj?.action;
+
+    const normalized = String(raw).toLowerCase().trim();
+    if (/^eye_\d+$/.test(normalized)) {
+      const level = Math.max(0, Math.min(100, Number(normalized.slice("eye_".length)) || 0));
+      return `eye_${level}`;
+    }
+    throw new Error(`Unsupported eye action: ${raw}`);
+  }
+
+  _resolveAction(command, obj) {
+    switch (command) {
+      case "clap":
+        return "clap";
+      case "mouth_move":
+      case "mouth_small":
+      case "mouth_large":
+        return command;
+      case "mouth":
+        return this._resolveMouthAction(obj);
+      case "eye":
+        return this._resolveEyeAction(obj);
+      default:
+        if (/^eye_\d+$/.test(String(command).toLowerCase())) {
+          return this._resolveEyeAction(command);
+        }
+        return command;
+    }
+  }
+
+  _buildPayload(command, action, obj) {
+    if (obj && typeof obj === "object") {
+      return { command, ...obj, action };
+    }
+
+    return obj === undefined ? { command, action } : { command, action, value: obj };
+  }
+
+  _padNumber(value, width) {
+    const parsed = Number.isFinite(Number(value)) ? Number(value) : 0;
+    const normalized = Math.max(0, Math.floor(parsed));
+    return String(normalized).padStart(width, "0").slice(-width);
+  }
+
+  _toFrameActionCode(action) {
+    switch (action) {
+      case "clap":
+        return "C";
+      case "mouth_move":
+        return "M";
+      case "mouth_small":
+        return "M";
+      case "mouth_large":
+        return "M";
+      default:
+        if (/^mouth_\d+$/.test(action)) {
+          return "M";
+        }
+        if (/^eye_\d+$/.test(String(action).toLowerCase())) {
+          return "E";
+        }
+        throw new Error(`Unsupported action for fixed frame: ${action}`);
+    }
+  }
+
+  _resolveDurationMs(action) {
+    switch (action) {
+      case "clap":
+        return 40;
+      case "mouth_move":
+        return 100;
+      case "mouth_small":
+        return 250;
+      case "mouth_large":
+        return 500;
+      default:
+        if (/^mouth_\d+$/.test(action)) {
+          return Number(String(action).slice("mouth_".length)) || 0;
+        }
+        if (/^eye_\d+$/.test(String(action).toLowerCase())) {
+          const level = Math.max(0, Math.min(100, Number(String(action).slice("eye_".length)) || 0));
+          return level * 10;
+        }
+        throw new Error(`Unsupported action duration: ${action}`);
+    }
+  }
+
+  _toFixedFrame(action, obj) {
+    const actionCode = this._toFrameActionCode(action);
+    const durationMs = this._resolveDurationMs(action);
+    if (durationMs < 0 || durationMs > 3000) {
+      throw new Error(`Duration must be between 0ms and 3000ms: ${durationMs}`);
+    }
+
+    const units = Math.round(durationMs / 10);
+    const body = `${actionCode}${this._padNumber(units, 3)}`;
+
+    const hasSeq = obj && typeof obj === "object" && obj.seq != null && Number.isFinite(Number(obj.seq));
+    if (!hasSeq) {
+      return body;
+    }
+
+    const seq = Number(obj.seq);
+    return `${body}S${this._padNumber(seq, 4)}`;
+  }
+
+  async _sendCommand(command, obj, { lineEnding } = {}) {
     this._log(`[Robot] Sending command: ${command} with payload:`, obj);
 
     if (!this._writer) {
       throw new Error("serial not connected");
     }
 
-    const serialObj = obj && typeof obj === "object" ? { command, ...obj } : { command, value: obj };
-
+    const action = this._resolveAction(command, obj);
+    const frame = this._toFixedFrame(action, obj);
     const ending = this._resolveLineEnding(lineEnding);
-    const payload = `${JSON.stringify(serialObj)}${ending}`;
+    const payload = `${frame}${ending}`;
     await this._writer.ready;
     await this._writer.write(this._textEncoder.encode(payload));
     this._log("[Robot] Serial write completed:", payload);
