@@ -1,7 +1,7 @@
 [
   {
     "type": "clapper",
-    "filters": [{ "usbVendorId": 1027, "usbProductId": 24577 }]
+    "filters": [{ "usbVendorId": 1027, "usbProductId": 24577 },{ "usbVendorId": 12346, "usbProductId": 4097 }]
   },
   {
     "type": "dmx",
