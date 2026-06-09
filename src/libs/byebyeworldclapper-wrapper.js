@@ -153,10 +153,19 @@ export default class ByebyeworldWrapper {
     }
 
     const grantedPorts = await navigator.serial.getPorts();
-    const availableGrantedPort = grantedPorts.find((port) => !this._isExcludedPort(port, excludePortInfos));
-    if (availableGrantedPort) {
-      return availableGrantedPort;
+    console.log("Granted serial ports:", grantedPorts);
+    for( const port of grantedPorts) {
+      const info = port.getInfo?.();
+      console.log("Port info:", info);
+      if( info.usbVendorId === 12346 && info.usbProductId === 4097) {
+        console.log("Found matching port:", port);
+        return port;
+      }
     }
+    // const availableGrantedPort = grantedPorts.find((port) => !this._isExcludedPort(port, excludePortInfos));
+    // if (availableGrantedPort) {
+    //  return availableGrantedPort;
+    // }
 
     if (!allowPrompt) {
       throw new Error("no previously granted serial ports");
@@ -181,6 +190,7 @@ export default class ByebyeworldWrapper {
       return;
     }
 
+    console.log("connect() called with options:", { allowPrompt, filters, excludePortInfos });
     this._log("[Robot] Attempting to connect to serial port...");
     const selectedFilters = filters ?? this._filters;
     const tryOpenPort = async (port) => {

@@ -164,6 +164,7 @@ function App() {
                   await _handleRobotRef.current
                     .connect()
                     .then(() => {
+                      console.log("Clapper Connected");
                       setIsClapperOn(true);
                     })
                     .catch((err) => {

@@ -57,7 +57,7 @@ export default class DMXWrapper {
   _status = STATUS.IDLE;
   _writer = null;
   _timer;
-  _autoSelectGrantedPorts = false;
+  _autoSelectGrantedPorts = true;
 
   get status() {
     return this._status;
