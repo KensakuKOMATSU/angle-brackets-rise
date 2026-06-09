@@ -17,6 +17,7 @@ function App() {
   const [_lyrics, setLyrics] = useState([]);
   const _trackRef = useRef(null);
   const _videoRef = useRef(null);
+  const _replayTimeoutRef = useRef(null);
   const _called = useRef(false);
   const _visualizerRef = useRef();
   const _starsLeftRef = useRef();
@@ -113,6 +114,14 @@ function App() {
     }
   }, [_setOnCueChangeEventForVMT]);
 
+  useEffect(() => {
+    return () => {
+      if (_replayTimeoutRef.current) {
+        clearTimeout(_replayTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="App">
       <main>
@@ -121,7 +130,22 @@ function App() {
             <h1>Angle Brackets Rise</h1>
           </div>
           <div className="media-controller">
-            <video loop style={{ width: "50vw", visibility: "hidden" }} controls ref={_videoRef}>
+            <video
+              style={{ width: "50vw", visibility: "hidden" }}
+              controls
+              ref={_videoRef}
+              onEnded={() => {
+                if (_replayTimeoutRef.current) {
+                  clearTimeout(_replayTimeoutRef.current);
+                }
+                // loopではなく余韻を残すために終了後5秒たったら再生させる
+                _replayTimeoutRef.current = setTimeout(async () => {
+                  if (!_videoRef.current) return;
+                  _videoRef.current.currentTime = 0;
+                  await _videoRef.current.play();
+                }, 5000);
+              }}
+            >
               <source src="/assets/angle_brackets_rise.m4a" type="audio/mpeg" />
               <track ref={_trackRef} src="/assets/lyric.vtt" kind="subtitles" srcLang="en" label="English" default />
               <track src="/assets/dmx-left.vmt" kind="metadata" htmlFor="left" default />
