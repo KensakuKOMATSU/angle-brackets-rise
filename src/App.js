@@ -265,8 +265,10 @@ function App() {
       const key = event.key.toLowerCase();
       if (key === "c") {
         await Promise.all([_toggleClapper(true), _toggleDMX(true)]);
+        document.activeElement?.blur?.();
       } else if (key === "r") {
         await Promise.all([_toggleClapper(false), _toggleDMX(false), _pauseMusic()]);
+        document.activeElement?.blur?.();
       }
     };
 
