@@ -14,10 +14,13 @@ import { Switch, Button } from "antd";
 import "./App.css";
 
 function App() {
+  const CURSOR_HIDE_DELAY_MS = 2000;
+
   const [_lyrics, setLyrics] = useState([]);
   const _trackRef = useRef(null);
   const _videoRef = useRef(null);
   const _replayTimeoutRef = useRef(null);
+  const _cursorHideTimeoutRef = useRef(null);
   const _called = useRef(false);
   const _visualizerRef = useRef();
   const _starsLeftRef = useRef();
@@ -28,6 +31,106 @@ function App() {
   const [_isVideoPlayed, setIsVideoPlayed] = useState(false);
   const [_isSwitchToggled, setIsSwitchToggled] = useState(false);
   const [_isClapperOn, setIsClapperOn] = useState(false);
+  const [_isCursorVisible, setIsCursorVisible] = useState(true);
+
+  const _resetCursorTimer = useCallback(() => {
+    setIsCursorVisible(true);
+    if (_cursorHideTimeoutRef.current) {
+      clearTimeout(_cursorHideTimeoutRef.current);
+    }
+
+    _cursorHideTimeoutRef.current = setTimeout(() => {
+      setIsCursorVisible(false);
+    }, CURSOR_HIDE_DELAY_MS);
+  }, [CURSOR_HIDE_DELAY_MS]);
+
+  const _toggleClapper = useCallback(async (checked) => {
+    console.log("Clapper Switch", checked);
+
+    if (!_handleRobotRef.current) {
+      _handleRobotRef.current = new ByebyeworldWrapper({
+        filters: device_setting.find((f) => f.type === "clapper")?.filters,
+      });
+    }
+
+    if (checked && _handleRobotRef.current.connected) {
+      setIsClapperOn(true);
+      return;
+    }
+
+    if (!checked && !_handleRobotRef.current.connected) {
+      setIsClapperOn(false);
+      return;
+    }
+
+    if (checked) {
+      // 接続してから、スイッチをオンにする
+      await _handleRobotRef.current
+        .connect()
+        .then(() => {
+          console.log("Clapper Connected");
+          setIsClapperOn(true);
+        })
+        .catch((err) => {
+          setIsClapperOn(false);
+          console.error("Clapper Connection Error:", err);
+          return;
+        });
+    } else {
+      // 切断してから、スイッチをオフにする
+      await _handleRobotRef.current
+        .disconnect()
+        .then(() => {
+          setIsClapperOn(false);
+        })
+        .catch((err) => {
+          setIsClapperOn(true);
+          console.error("Clapper Disconnection Error:", err);
+          return;
+        });
+    }
+  }, []);
+
+  const _toggleDMX = useCallback(async (checked) => {
+    console.log("DMX Switch", checked);
+    if (!_dmxRef.current) {
+      _dmxRef.current = new DMXWrapper();
+    }
+
+    if (checked && _dmxRef.current.connected) {
+      setIsSwitchToggled(true);
+      return;
+    }
+
+    if (!checked && !_dmxRef.current.connected) {
+      setIsSwitchToggled(false);
+      return;
+    }
+
+    if (checked) {
+      await _dmxRef.current
+        .connect()
+        .then(() => {
+          setIsSwitchToggled(true);
+        })
+        .catch((err) => {
+          setIsSwitchToggled(false);
+          console.error("DMX Connection Error:", err);
+          return;
+        });
+    } else {
+      await _dmxRef.current
+        .disconnect()
+        .then(() => {
+          setIsSwitchToggled(false);
+        })
+        .catch((err) => {
+          setIsSwitchToggled(true);
+          console.error("DMX Disconnection Error:", err);
+          return;
+        });
+    }
+  }, []);
 
   const _setOnCueChangeEventForVMT = useCallback(() => {
     const trackElements = document.querySelectorAll('track[kind="metadata"]');
@@ -122,8 +225,53 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const onUserActivity = () => {
+      _resetCursorTimer();
+    };
+
+    _resetCursorTimer();
+    window.addEventListener("mousemove", onUserActivity);
+    window.addEventListener("mousedown", onUserActivity);
+    window.addEventListener("wheel", onUserActivity);
+    window.addEventListener("touchstart", onUserActivity);
+
+    return () => {
+      window.removeEventListener("mousemove", onUserActivity);
+      window.removeEventListener("mousedown", onUserActivity);
+      window.removeEventListener("wheel", onUserActivity);
+      window.removeEventListener("touchstart", onUserActivity);
+      if (_cursorHideTimeoutRef.current) {
+        clearTimeout(_cursorHideTimeoutRef.current);
+      }
+    };
+  }, [_resetCursorTimer]);
+
+  useEffect(() => {
+    const onKeyDown = async (event) => {
+      const tagName = event.target?.tagName;
+      const isTypingTarget =
+        tagName === "INPUT" ||
+        tagName === "TEXTAREA" ||
+        event.target?.isContentEditable;
+      if (isTypingTarget) return;
+
+      const key = event.key.toLowerCase();
+      if (key === "c") {
+        await Promise.all([_toggleClapper(true), _toggleDMX(true)]);
+      } else if (key === "r") {
+        await Promise.all([_toggleClapper(false), _toggleDMX(false)]);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [_toggleClapper, _toggleDMX]);
+
   return (
-    <div className="App">
+    <div className={_isCursorVisible ? "App" : "App cursor-hidden"}>
       <main>
         <div className="App-content">
           <div className="header">
@@ -174,77 +322,13 @@ function App() {
               checkedChildren="clapper On"
               checked={_isClapperOn}
               unCheckedChildren="clapper Off"
-              onChange={async (checked) => {
-                console.log("Clapper Switch", checked);
-
-                if (!_handleRobotRef.current) {
-                  _handleRobotRef.current = new ByebyeworldWrapper({
-                    filters: device_setting.find((f) => f.type === "clapper")?.filters,
-                  });
-                }
-
-                if (checked) {
-                  // 接続してから、スイッチをオンにする
-                  await _handleRobotRef.current
-                    .connect()
-                    .then(() => {
-                      console.log("Clapper Connected");
-                      setIsClapperOn(true);
-                    })
-                    .catch((err) => {
-                      setIsClapperOn(false);
-                      console.error("Clapper Connection Error:", err);
-                      return;
-                    });
-                } else {
-                  // 切断してから、スイッチをオフにする
-                  await _handleRobotRef.current
-                    .disconnect()
-                    .then(() => {
-                      setIsClapperOn(false);
-                    })
-                    .catch((err) => {
-                      setIsClapperOn(true);
-                      console.error("Clapper Disconnection Error:", err);
-                      return;
-                    });
-                }
-              }}
+              onChange={_toggleClapper}
             />
             <Switch
               checkedChildren="DMX On"
               checked={_isSwitchToggled}
               unCheckedChildren="DMX Off"
-              onChange={async (checked) => {
-                console.log("DMX Switch", checked);
-                if (!_dmxRef.current) {
-                  _dmxRef.current = new DMXWrapper();
-                }
-
-                if (checked) {
-                  await _dmxRef.current
-                    .connect()
-                    .then(() => {
-                      setIsSwitchToggled(true);
-                    })
-                    .catch((err) => {
-                      setIsSwitchToggled(false);
-                      console.error("DMX Connection Error:", err);
-                      return;
-                    });
-                } else {
-                  await _dmxRef.current
-                    .disconnect()
-                    .then(() => {
-                      setIsSwitchToggled(false);
-                    })
-                    .catch((err) => {
-                      setIsSwitchToggled(true);
-                      console.error("DMX Disconnection Error:", err);
-                      return;
-                    });
-                }
-              }}
+              onChange={_toggleDMX}
             />
             <Switch
               style={{ marginLeft: "10px" }}

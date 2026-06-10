@@ -6,6 +6,11 @@
   overflow: hidden;
 }
 
+.App.cursor-hidden,
+.App.cursor-hidden * {
+  cursor: none !important;
+}
+
 .App main .header {
   position: absolute;
   left: 0;
