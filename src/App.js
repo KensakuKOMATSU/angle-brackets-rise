@@ -132,6 +132,12 @@ function App() {
     }
   }, []);
 
+  const _pauseMusic = useCallback(async () => {
+    if (_videoRef.current && !_videoRef.current.paused) {
+      _videoRef.current.pause();
+    }
+  }, []);
+
   const _setOnCueChangeEventForVMT = useCallback(() => {
     const trackElements = document.querySelectorAll('track[kind="metadata"]');
     const defaultColor = "rgb(129, 140, 248)"; // 薄い紫色 (Indigo-300)
@@ -260,7 +266,7 @@ function App() {
       if (key === "c") {
         await Promise.all([_toggleClapper(true), _toggleDMX(true)]);
       } else if (key === "r") {
-        await Promise.all([_toggleClapper(false), _toggleDMX(false)]);
+        await Promise.all([_toggleClapper(false), _toggleDMX(false), _pauseMusic()]);
       }
     };
 
