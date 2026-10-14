@@ -29,6 +29,7 @@ function App() {
   const _dmxRef = useRef(null);
   const _handleRobotRef = useRef(null);
   const _stackChanRefs = useRef({ serial: null, bluetooth: null });
+  const _stackChanReactionRefs = useRef({});
 
   const [_isVideoPlayed, setIsVideoPlayed] = useState(false);
   const [_isSwitchToggled, setIsSwitchToggled] = useState(false);
@@ -44,17 +45,46 @@ function App() {
     setStackChanError(`${label}: ${error.message || error}`);
   }, []);
 
+  const _sendStackChanControl = useCallback((transport, data) => {
+    const reaction = _stackChanReactionRefs.current[transport];
+    if (data.expression !== undefined) reaction.appearance.expression = data.expression;
+    if (data.mouth) reaction.appearance.mouth = { ...reaction.appearance.mouth, ...data.mouth };
+    const payload = { ...data };
+    if (reaction.timeout !== null) {
+      delete payload.expression;
+      delete payload.mouth;
+    }
+    return Object.keys(payload).length ? _stackChanRefs.current[transport].send(payload) : Promise.resolve();
+  }, []);
+
   const _toggleStackChan = useCallback(async (transport, checked) => {
     if (!_stackChanRefs.current[transport]) {
+      const reaction = {
+        appearance: { expression: "neutral", mouth: { type: "closed", open_ratio: 0 } },
+        timeout: null,
+      };
+      _stackChanReactionRefs.current[transport] = reaction;
       _stackChanRefs.current[transport] = new StackChanWrapper({
         transport,
         onConnectionChange: (connected) => {
+          if (!connected) {
+            clearTimeout(reaction.timeout);
+            reaction.timeout = null;
+          }
           setStackChanConnected((previous) => ({ ...previous, [transport]: connected }));
         },
         onReceive: (message) => {
           console.log(`StackChan ${transport} RX:`, message);
           const wrapper = _stackChanRefs.current[transport];
-          if (transport !== "bluetooth" || !wrapper?.connected || typeof message?.ok === "boolean") return;
+          if (!wrapper?.connected || typeof message?.ok === "boolean") return;
+          clearTimeout(reaction.timeout);
+          reaction.timeout = setTimeout(() => {
+            reaction.timeout = null;
+            if (wrapper.connected) {
+              wrapper.send({ ...reaction.appearance, mouth: { ...reaction.appearance.mouth } })
+                .catch((error) => _reportStackChanError(transport, error));
+            }
+          }, 3000);
           wrapper.send({ expression: "happy_heart", mouth: { type: "smile" } }).catch((error) => _reportStackChanError(transport, error));
         },
         onError: (error) => _reportStackChanError(transport, error),
@@ -71,7 +101,7 @@ function App() {
           const cues = trackElement.track?.activeCues;
           const cue = cues?.[cues.length - 1];
           if (cue?.type === "org.webvmt.example.stackchan") {
-            await wrapper.send(cue.value);
+            await _sendStackChanControl(transport, cue.value);
           }
         }
       } else {
@@ -82,7 +112,7 @@ function App() {
     } finally {
       setStackChanConnecting((previous) => ({ ...previous, [transport]: false }));
     }
-  }, [_reportStackChanError]);
+  }, [_reportStackChanError, _sendStackChanControl]);
 
   const _resetCursorTimer = useCallback(() => {
     setIsCursorVisible(true);
@@ -225,7 +255,7 @@ function App() {
               await Promise.all(Object.entries(_stackChanRefs.current).map(async ([transport, wrapper]) => {
                 if (!wrapper?.connected) return;
                 try {
-                  await wrapper.send(currentCue.value);
+                  await _sendStackChanControl(transport, currentCue.value);
                 } catch (error) {
                   _reportStackChanError(transport, error);
                 }
@@ -256,7 +286,7 @@ function App() {
         });
       }
     }
-  }, [_reportStackChanError]);
+  }, [_reportStackChanError, _sendStackChanControl]);
 
   useEffect(() => {
     if (_trackRef.current) {
@@ -285,7 +315,12 @@ function App() {
 
   useEffect(() => {
     const wrappers = _stackChanRefs.current;
+    const reactions = _stackChanReactionRefs.current;
     return () => {
+      for (const reaction of Object.values(reactions)) {
+        clearTimeout(reaction.timeout);
+        reaction.timeout = null;
+      }
       for (const wrapper of Object.values(wrappers)) {
         if (!wrapper) continue;
         wrapper.onConnectionChange = () => { };

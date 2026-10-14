@@ -108,8 +108,8 @@ test("connection synchronizes active cues and unexpected disconnection turns the
 
 test.each([
   ["StackChan-BT", 1],
-  ["StackChan-Serial", 0],
-])("receiving sensor events on %s sends the heart expression only over Bluetooth", async (label, expectedSends) => {
+  ["StackChan-Serial", 1],
+])("receiving sensor events on %s sends the heart expression and smile", async (label, expectedSends) => {
   await renderApp();
   fireEvent.click(screen.getByRole("switch", { name: label }));
   await waitFor(() => expect(screen.getByRole("switch", { name: label })).toBeChecked());
@@ -132,6 +132,70 @@ test("Bluetooth command replies and notifications after disconnection do not tri
     wrapper.onReceive({ type: "events", events: { touch_front: 1 } });
   });
   expect(wrapper.send).not.toHaveBeenCalled();
+});
+
+test.each(["StackChan-BT", "StackChan-Serial"])("%s keeps the reaction for three seconds after the last event and restores the latest VMT appearance", async (label) => {
+  const { container, unmount } = await renderApp();
+  const faceTrack = container.querySelector('track[src="/assets/stackchan_face.vmt"]');
+  const mouthTrack = container.querySelector('track[src="/assets/stackchan_mouth.vmt"]');
+  faceTrack.track.activeCues = [{ type: "org.webvmt.example.stackchan", value: { expression: "sleepy" } }];
+  mouthTrack.track.activeCues = [{ type: "org.webvmt.example.stackchan", value: { mouth: { type: "open", open_ratio: 30 } } }];
+  fireEvent.click(screen.getByRole("switch", { name: label }));
+  await waitFor(() => expect(screen.getByRole("switch", { name: label })).toBeChecked());
+  const wrapper = StackChanWrapper.mock.results[0].value;
+  wrapper.send.mockClear();
+  jest.useFakeTimers();
+  try {
+    act(() => wrapper.onReceive({ type: "events", events: { touch_front: 1 } }));
+    expect(wrapper.send).toHaveBeenLastCalledWith({ expression: "happy_heart", mouth: { type: "smile" } });
+    act(() => jest.advanceTimersByTime(1000));
+    faceTrack.track.activeCues = [{ type: "org.webvmt.example.stackchan", value: { expression: "neutral" } }];
+    mouthTrack.track.activeCues = [{ type: "org.webvmt.example.stackchan", value: { mouth: { type: "open", open_ratio: 100 } } }];
+    await act(async () => {
+      fireEvent(faceTrack, new Event("cuechange"));
+      fireEvent(mouthTrack, new Event("cuechange"));
+    });
+    expect(wrapper.send).toHaveBeenCalledTimes(1);
+    const moveTrack = container.querySelector('track[src="/assets/stackchan_move.vmt"]');
+    const movement = { servo: { x: 0, y: 30, duration: 1000 } };
+    moveTrack.track.activeCues = [{ type: "org.webvmt.example.stackchan", value: movement }];
+    await act(async () => fireEvent(moveTrack, new Event("cuechange")));
+    expect(wrapper.send).toHaveBeenLastCalledWith(movement);
+    act(() => wrapper.onReceive({ type: "events", events: { touch_middle: 1 } }));
+    act(() => wrapper.onReceive({ ok: true, expression: "happy_heart", mouth: "smile" }));
+    act(() => jest.advanceTimersByTime(2999));
+    expect(wrapper.send).toHaveBeenCalledTimes(3);
+    act(() => jest.advanceTimersByTime(1));
+    expect(wrapper.send).toHaveBeenCalledTimes(4);
+    expect(wrapper.send).toHaveBeenLastCalledWith({ expression: "neutral", mouth: { type: "open", open_ratio: 100 } });
+    await act(async () => fireEvent(mouthTrack, new Event("cuechange")));
+    expect(wrapper.send).toHaveBeenLastCalledWith({ mouth: { type: "open", open_ratio: 100 } });
+  } finally {
+    unmount();
+    jest.useRealTimers();
+  }
+});
+
+test.each(["disconnect", "unmount"])("reaction restoration is cancelled on %s", async (action) => {
+  const { unmount } = await renderApp();
+  fireEvent.click(screen.getByRole("switch", { name: "StackChan-Serial" }));
+  await waitFor(() => expect(screen.getByRole("switch", { name: "StackChan-Serial" })).toBeChecked());
+  const wrapper = StackChanWrapper.mock.results[0].value;
+  jest.useFakeTimers();
+  try {
+    act(() => wrapper.onReceive({ type: "events", events: { touch_front: 1 } }));
+    if (action === "unmount") {
+      unmount();
+    } else {
+      act(() => { wrapper.connected = false; wrapper.onConnectionChange(false); });
+      wrapper.connected = true;
+    }
+    act(() => jest.advanceTimersByTime(3000));
+    expect(wrapper.send).toHaveBeenCalledTimes(1);
+  } finally {
+    unmount();
+    jest.useRealTimers();
+  }
 });
 
 test("connection errors leave the switch off and are displayed", async () => {

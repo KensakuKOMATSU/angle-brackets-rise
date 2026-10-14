@@ -78,6 +78,10 @@ namespace
   bool servoShakeSuppressionActive = false;
   uint32_t servoShakeSuppressionUntil = 0;
   bool restoreAutoAngleSyncWhenIdle = false;
+  volatile bool bleConnected = false;
+  bool displayedConnectionStatus = false;
+  bool connectionStateKnown = false;
+  String expressionBeforeDisconnect = "neutral";
   uint32_t lastImuSampleAt = 0;
   uint32_t lastShakeAt = 0;
   float previousAccelX = 0;
@@ -94,12 +98,12 @@ namespace
     return static_cast<uint32_t>((static_cast<uint64_t>(elapsed) * 1000) / duration);
   }
 
-  void drawThickLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
+  void drawThickLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color = TFT_WHITE)
   {
     auto &display = M5StackChan.Display();
-    display.drawLine(x0, y0 - 1, x1, y1 - 1, TFT_WHITE);
-    display.drawLine(x0, y0, x1, y1, TFT_WHITE);
-    display.drawLine(x0, y0 + 1, x1, y1 + 1, TFT_WHITE);
+    display.drawLine(x0, y0 - 1, x1, y1 - 1, color);
+    display.drawLine(x0, y0, x1, y1, color);
+    display.drawLine(x0, y0 + 1, x1, y1 + 1, color);
   }
 
   void drawFilledHeart(int16_t centerX, int16_t centerY)
@@ -111,12 +115,12 @@ namespace
     {
       display.fillTriangle(centerX, centerY,
                            centerX + x[index], centerY + y[index],
-                           centerX + x[index + 1], centerY + y[index + 1], TFT_WHITE);
+                           centerX + x[index + 1], centerY + y[index + 1], TFT_RED);
     }
     for (size_t index = 0; index < 12; ++index)
     {
       drawThickLine(centerX + x[index], centerY + y[index],
-                    centerX + x[index + 1], centerY + y[index + 1]);
+                    centerX + x[index + 1], centerY + y[index + 1], TFT_RED);
     }
   }
 
@@ -233,6 +237,33 @@ namespace
     display.fillScreen(TFT_BLACK);
     drawEyes();
     drawMouth();
+  }
+
+  bool isTransportConnected()
+  {
+    return runningMode == ControlMode::Serial ? HWCDC::isPlugged() : bleConnected;
+  }
+
+  void updateConnectionStatus()
+  {
+    const bool connected = isTransportConnected();
+    if (connectionStateKnown && displayedConnectionStatus == connected)
+    {
+      return;
+    }
+
+    connectionStateKnown = true;
+    displayedConnectionStatus = connected;
+    if (connected)
+    {
+      faceState.expression = expressionBeforeDisconnect;
+    }
+    else
+    {
+      expressionBeforeDisconnect = faceState.expression;
+      faceState.expression = "sad";
+    }
+    drawFace();
   }
 
   void updateFaceAnimation()
@@ -634,8 +665,14 @@ namespace
 
   class BleServerCallbacks : public BLEServerCallbacks
   {
+    void onConnect(BLEServer *) override
+    {
+      bleConnected = true;
+    }
+
     void onDisconnect(BLEServer *) override
     {
+      bleConnected = false;
       BLEDevice::startAdvertising();
     }
   };
@@ -666,13 +703,13 @@ namespace
     if (runningMode == ControlMode::Serial)
     {
       Serial.begin(115200);
-      drawFace();
+      updateConnectionStatus();
       Serial.println("{\"ready\":true,\"mode\":\"serial\"}");
     }
     else
     {
       startBluetooth();
-      drawFace();
+      updateConnectionStatus();
     }
   }
 
@@ -789,6 +826,7 @@ void setup()
   motionJob.startY = constrain(M5StackChan.Motion.getCurrentYAngle() / 10.0f, 5, 85);
   motionJob.targetX = motionJob.startX;
   motionJob.targetY = motionJob.startY;
+  scheduleMotion(0, 5, 1000);
   bootStartedAt = millis();
   drawModeSelector();
   drawModeCountdown((kModeSelectDurationMs + 999) / 1000);
@@ -801,6 +839,7 @@ void loop()
   if (!modeStarted)
   {
     handleModeSelection();
+    updateMotion();
     return;
   }
 
@@ -819,6 +858,7 @@ void loop()
     }
   }
   updateFaceAnimation();
+  updateConnectionStatus();
   updateMotion();
   delay(2);
 }
