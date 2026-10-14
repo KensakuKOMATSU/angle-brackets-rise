@@ -102,11 +102,17 @@ namespace
     display.drawLine(x0, y0 + 1, x1, y1 + 1, TFT_WHITE);
   }
 
-  void drawHeartOutline(int16_t centerX, int16_t centerY)
+  void drawFilledHeart(int16_t centerX, int16_t centerY)
   {
     auto &display = M5StackChan.Display();
     const int16_t x[] = {0, -9, -12, -12, -8, -3, 0, 3, 8, 12, 12, 9, 0};
     const int16_t y[] = {12, 5, 1, -5, -11, -11, -6, -11, -11, -5, 1, 5, 12};
+    for (size_t index = 0; index < 12; ++index)
+    {
+      display.fillTriangle(centerX, centerY,
+                           centerX + x[index], centerY + y[index],
+                           centerX + x[index + 1], centerY + y[index + 1], TFT_WHITE);
+    }
     for (size_t index = 0; index < 12; ++index)
     {
       drawThickLine(centerX + x[index], centerY + y[index],
@@ -138,8 +144,8 @@ namespace
 
     if (faceState.expression == "happy_heart")
     {
-      drawHeartOutline(leftEyeX, eyeY);
-      drawHeartOutline(rightEyeX, eyeY);
+      drawFilledHeart(leftEyeX, eyeY);
+      drawFilledHeart(rightEyeX, eyeY);
     }
     else if (faceState.expression == "sleepy")
     {
@@ -196,12 +202,13 @@ namespace
     }
     else if (faceState.mouthType == "smile")
     {
-      display.drawLine(mouthCenterX - 22, mouthCenterY - 5,
-                       mouthCenterX - 11, mouthCenterY + 7, TFT_WHITE);
-      display.drawLine(mouthCenterX - 11, mouthCenterY + 7,
-                       mouthCenterX + 11, mouthCenterY + 7, TFT_WHITE);
-      display.drawLine(mouthCenterX + 11, mouthCenterY + 7,
-                       mouthCenterX + 22, mouthCenterY - 5, TFT_WHITE);
+      const int16_t mouthX[] = {-22, -11, 0, 11, 22};
+      const int16_t mouthY[] = {-1, 2, 4, 2, -1};
+      for (size_t index = 0; index < 4; ++index)
+      {
+        drawThickLine(mouthCenterX + mouthX[index], mouthCenterY + mouthY[index],
+                      mouthCenterX + mouthX[index + 1], mouthCenterY + mouthY[index + 1]);
+      }
     }
     else
     {
