@@ -10,6 +10,14 @@ PlatformIOで`m5stack-cores3`環境をビルドします。StackChan公式BSP 1.
 pio run
 ```
 
+## VS Codeでの環境構築
+
+1. VS Codeをインストールし、拡張機能ビューから「PlatformIO IDE」（`platformio.platformio-ide`）をインストールします。
+2. `platformio.ini`があるプロジェクトルートのフォルダーをVS Codeで開きます。PlatformIOの初期化が完了するまで待ちます。
+3. PlatformIOの「PROJECT TASKS」から`m5stack-cores3` →「General」→「Build」を実行します。初回ビルド時にPlatformIOがプラットフォーム、ツールチェーン、ライブラリをダウンロードします。
+
+ターミナルからビルドする場合は、PlatformIO CoreのCLIを使って`pio run`を実行します。シリアルモニターは同じタスク一覧の「Monitor」から起動できます（速度は115200 bpsです）。
+
 ## 起動と接続
 
 電源投入後、画面に接続方式が5秒間表示されます。画面の左半分をタップするとWeb Serial、右半分をタップするとWeb Bluetoothが選択され、ハイライト表示とともにNVSへ保存されます。選択後も5秒の待機を続け、時間切れで選択中のモードを起動します。操作がなければ前回保存されたモードで起動します。初回起動の既定値はWeb Serialです。
