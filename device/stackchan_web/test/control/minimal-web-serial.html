@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>StackChan Web Serial Minimal</title>
+</head>
+
+<body>
+    <h1>StackChan Web Serial</h1>
+    <button id="connect">接続</button>
+    <button id="disconnect" disabled>切断</button>
+    <p id="status">未接続</p>
+    <textarea id="message" rows="5"
+        cols="60">{"command":"control","expression":"happy","mouth":{"type":"open","open_ratio":0}}</textarea>
+    <button id="send" disabled>送信</button>
+    <h2>受信</h2>
+    <pre id="received"></pre>
+
+    <script>
+        const connectButton = document.querySelector('#connect');
+        const disconnectButton = document.querySelector('#disconnect');
+        const sendButton = document.querySelector('#send');
+        const status = document.querySelector('#status');
+        const message = document.querySelector('#message');
+        const received = document.querySelector('#received');
+        const encoder = new TextEncoder();
+        const decoder = new TextDecoder();
+        let port;
+        let writer;
+        let reader;
+        let readTask;
+
+        function setConnected(connected) {
+            connectButton.disabled = connected;
+            disconnectButton.disabled = !connected;
+            sendButton.disabled = !connected;
+            status.textContent = connected ? '接続中' : '未接続';
+        }
+
+        connectButton.addEventListener('click', async () => {
+            try {
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+                writer = port.writable.getWriter();
+                setConnected(true);
+                readTask = readLoop();
+            } catch (error) {
+                received.textContent += `${error.message}\n`;
+            }
+        });
+
+        async function readLoop() {
+            let pending = '';
+            reader = port.readable.getReader();
+            try {
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    pending += decoder.decode(value, { stream: true });
+                    const lines = pending.split(/\r?\n/);
+                    pending = lines.pop();
+                    for (const line of lines) {
+                        if (line) received.textContent = `${line}\n${received.textContent}`;
+                    }
+                }
+            } catch (error) {
+                received.textContent = `${error.message}\n${received.textContent}`;
+            } finally {
+                reader.releaseLock();
+                reader = undefined;
+            }
+        }
+
+        sendButton.addEventListener('click', async () => {
+            try {
+                const json = JSON.stringify(JSON.parse(message.value));
+                await writer.write(encoder.encode(`${json}\n`));
+            } catch (error) {
+                received.textContent = `${error.message}\n${received.textContent}`;
+            }
+        });
+
+        disconnectButton.addEventListener('click', async () => {
+            disconnectButton.disabled = true;
+            sendButton.disabled = true;
+            try {
+                await reader?.cancel();
+                await readTask;
+                writer?.releaseLock();
+                writer = undefined;
+                await port?.close();
+            } catch (error) {
+                received.textContent = `${error.message}\n${received.textContent}`;
+            } finally {
+                reader = undefined;
+                readTask = undefined;
+                port = undefined;
+                setConnected(false);
+            }
+        });
+    </script>
+</body>
+
+</html>

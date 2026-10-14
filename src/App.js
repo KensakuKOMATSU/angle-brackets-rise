@@ -6,6 +6,7 @@ import DMXWrapper from "./libs/dmx-wrapper";
 import { datacue2dmx } from "./libs/datacue2dmx";
 
 import ByebyeworldWrapper from "./libs/byebyeworldclapper-wrapper";
+import StackChanWrapper from "./libs/stackchan-wrapper";
 
 import device_setting from "./device-setting.json";
 
@@ -27,11 +28,61 @@ function App() {
   const _starsRightRef = useRef();
   const _dmxRef = useRef(null);
   const _handleRobotRef = useRef(null);
+  const _stackChanRefs = useRef({ serial: null, bluetooth: null });
 
   const [_isVideoPlayed, setIsVideoPlayed] = useState(false);
   const [_isSwitchToggled, setIsSwitchToggled] = useState(false);
   const [_isClapperOn, setIsClapperOn] = useState(false);
   const [_isCursorVisible, setIsCursorVisible] = useState(true);
+  const [_stackChanConnected, setStackChanConnected] = useState({ serial: false, bluetooth: false });
+  const [_stackChanConnecting, setStackChanConnecting] = useState({ serial: false, bluetooth: false });
+  const [_stackChanError, setStackChanError] = useState("");
+
+  const _reportStackChanError = useCallback((transport, error) => {
+    const label = transport === "serial" ? "StackChan-Serial" : "StackChan-BT";
+    console.error(`${label}:`, error);
+    setStackChanError(`${label}: ${error.message || error}`);
+  }, []);
+
+  const _toggleStackChan = useCallback(async (transport, checked) => {
+    if (!_stackChanRefs.current[transport]) {
+      _stackChanRefs.current[transport] = new StackChanWrapper({
+        transport,
+        onConnectionChange: (connected) => {
+          setStackChanConnected((previous) => ({ ...previous, [transport]: connected }));
+        },
+        onReceive: (message) => {
+          console.log(`StackChan ${transport} RX:`, message);
+          const wrapper = _stackChanRefs.current[transport];
+          if (transport !== "bluetooth" || !wrapper?.connected || typeof message?.ok === "boolean") return;
+          wrapper.send({ expression: "happy_heart", mouth: { type: "smile" } }).catch((error) => _reportStackChanError(transport, error));
+        },
+        onError: (error) => _reportStackChanError(transport, error),
+      });
+    }
+
+    const wrapper = _stackChanRefs.current[transport];
+    setStackChanConnecting((previous) => ({ ...previous, [transport]: true }));
+    setStackChanError("");
+    try {
+      if (checked) {
+        await wrapper.connect();
+        for (const trackElement of _videoRef.current.querySelectorAll('track[kind="metadata"]')) {
+          const cues = trackElement.track?.activeCues;
+          const cue = cues?.[cues.length - 1];
+          if (cue?.type === "org.webvmt.example.stackchan") {
+            await wrapper.send(cue.value);
+          }
+        }
+      } else {
+        await wrapper.disconnect();
+      }
+    } catch (error) {
+      _reportStackChanError(transport, error);
+    } finally {
+      setStackChanConnecting((previous) => ({ ...previous, [transport]: false }));
+    }
+  }, [_reportStackChanError]);
 
   const _resetCursorTimer = useCallback(() => {
     setIsCursorVisible(true);
@@ -170,6 +221,15 @@ function App() {
               if (_handleRobotRef.current && _handleRobotRef.current.connected) {
                 _handleRobotRef.current?.[forValue]?.(currentCue.value);
               }
+            } else if (currentCue.type === "org.webvmt.example.stackchan") {
+              await Promise.all(Object.entries(_stackChanRefs.current).map(async ([transport, wrapper]) => {
+                if (!wrapper?.connected) return;
+                try {
+                  await wrapper.send(currentCue.value);
+                } catch (error) {
+                  _reportStackChanError(transport, error);
+                }
+              }));
             }
           } else {
             //_visualizerRef.current.updateColor( forValue, { color: defaultColor } )
@@ -196,7 +256,7 @@ function App() {
         });
       }
     }
-  }, []);
+  }, [_reportStackChanError]);
 
   useEffect(() => {
     if (_trackRef.current) {
@@ -222,6 +282,18 @@ function App() {
       })();
     }
   }, [_setOnCueChangeEventForVMT]);
+
+  useEffect(() => {
+    const wrappers = _stackChanRefs.current;
+    return () => {
+      for (const wrapper of Object.values(wrappers)) {
+        if (!wrapper) continue;
+        wrapper.onConnectionChange = () => { };
+        wrapper.onError = (error) => console.error("StackChan cleanup:", error);
+        wrapper.disconnect().catch(wrapper.onError);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -309,6 +381,9 @@ function App() {
               <track src="/assets/byebyeworldclapper_clap.vmt" kind="metadata" htmlFor="clap" default />
               <track src="/assets/byebyeworldclapper_eye.vmt" kind="metadata" htmlFor="eye" default />
               <track src="/assets/byebyeworldclapper_mouth.vmt" kind="metadata" htmlFor="mouth" default />
+              <track src="/assets/stackchan_mouth.vmt" kind="metadata" htmlFor="stackchan-mouth" default />
+              <track src="/assets/stackchan_move.vmt" kind="metadata" htmlFor="stackchan-move" default />
+              <track src="/assets/stackchan_face.vmt" kind="metadata" htmlFor="stackchan-face" default />
             </video>
           </div>
           <div className="dashboard">
@@ -350,6 +425,25 @@ function App() {
                 }
               }}
             />
+            <Switch
+              aria-label="StackChan-Serial"
+              checkedChildren="StackChan-Serial On"
+              unCheckedChildren="StackChan-Serial Off"
+              checked={_stackChanConnected.serial}
+              loading={_stackChanConnecting.serial}
+              disabled={_stackChanConnecting.serial}
+              onChange={(checked) => _toggleStackChan("serial", checked)}
+            />
+            <Switch
+              aria-label="StackChan-BT"
+              checkedChildren="StackChan-BT On"
+              unCheckedChildren="StackChan-BT Off"
+              checked={_stackChanConnected.bluetooth}
+              loading={_stackChanConnecting.bluetooth}
+              disabled={_stackChanConnecting.bluetooth}
+              onChange={(checked) => _toggleStackChan("bluetooth", checked)}
+            />
+            {_stackChanError && <div role="alert">{_stackChanError}</div>}
           </div>
           <div className="stars-left">
             <Stars ref={_starsLeftRef} />

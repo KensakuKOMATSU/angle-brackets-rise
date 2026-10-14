@@ -26,7 +26,10 @@
 
 .App main {
   position: absolute;
-  left:0; top: 0; bottom: 0; right:0;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
   background-color: #282c34;
   min-height: 100vh;
   font-size: calc(10px + 2vmin);
@@ -35,7 +38,10 @@
 
 .App main .lyric {
   position: absolute;
-  left:0; top: 0; bottom: 0; right:0;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -54,6 +60,7 @@
   width: 50%;
   z-index: 5;
 }
+
 .App main .stars-right {
   position: absolute;
   right: 0;
@@ -80,6 +87,7 @@
   right: 0;
   z-index: 1002;
 }
+
 .App main .dashboard {
   position: absolute;
   bottom: 20px;

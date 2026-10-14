@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>StackChan Control Deck</title>
+    <style>
+        :root {
+            font-family: "Avenir Next", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+            color: #14292e;
+            background: #e9f1e8;
+            font-synthesis: none;
+            --ink: #14292e;
+            --muted: #557075;
+            --paper: #f8fbf3;
+            --line: #bfd0c8;
+            --teal: #006f6a;
+            --coral: #ef735b;
+            --lime: #cce66e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background-image: radial-gradient(#b9d0c4 0.7px, transparent 0.7px);
+            background-size: 14px 14px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px clamp(18px, 5vw, 64px);
+            border-bottom: 1px solid var(--line);
+            background: rgba(248, 251, 243, .92);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            display: grid;
+            width: 42px;
+            aspect-ratio: 1;
+            place-items: center;
+            border-radius: 12px;
+            background: var(--teal);
+            color: white;
+            font-size: 22px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 19px;
+            font-weight: 750;
+        }
+
+        .subhead {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        #connectionStatus {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        #connectionStatus::before {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #9aa9a2;
+            content: "";
+        }
+
+        #connectionStatus[data-connected="true"]::before {
+            background: #2c9c71;
+            box-shadow: 0 0 0 4px #2c9c7122;
+        }
+
+        main {
+            width: min(1040px, calc(100% - 32px));
+            margin: 28px auto 52px;
+        }
+
+        .connection-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 0 0 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .tabs {
+            display: inline-flex;
+            padding: 4px;
+            gap: 3px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--paper);
+        }
+
+        button,
+        select,
+        input,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .tab,
+        .action,
+        .send-button {
+            min-height: 40px;
+            border: 0;
+            border-radius: 7px;
+            padding: 0 15px;
+            font-weight: 700;
+        }
+
+        .tab {
+            color: var(--muted);
+            background: transparent;
+        }
+
+        .tab[aria-selected="true"] {
+            color: white;
+            background: var(--ink);
+        }
+
+        .action {
+            border: 1px solid var(--line);
+            background: var(--paper);
+            color: var(--ink);
+        }
+
+        .action:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .control-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
+            gap: 36px;
+            padding-top: 24px;
+        }
+
+        h2 {
+            margin: 0 0 18px;
+            font-size: 15px;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+        }
+
+        .servo-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .servo-toggle input {
+            margin: 0;
+            accent-color: var(--teal);
+        }
+
+        .field-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 9px;
+        }
+
+        .field-option>label {
+            margin: 0;
+        }
+
+        .section-heading span,
+        .hint {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .field {
+            padding: 0;
+        }
+
+        .field:first-child {
+            padding-top: 0;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 90px;
+            gap: 16px;
+            align-items: center;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--teal);
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            min-height: 40px;
+            padding: 0 10px;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            color: var(--ink);
+            background: var(--paper);
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .select-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .send-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding-top: 18px;
+        }
+
+        .send-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .send-button {
+            min-width: 150px;
+            background: var(--coral);
+            color: #271b18;
+        }
+
+        .send-button:not(:disabled):hover {
+            background: #f5846c;
+        }
+
+        .send-button:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .preview {
+            position: sticky;
+            top: 18px;
+            align-self: start;
+        }
+
+        .preview-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .preview-title h2 {
+            margin: 0;
+        }
+
+        .live-tag {
+            padding: 4px 8px;
+            border-radius: 5px;
+            background: var(--lime);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 212px;
+            padding: 16px;
+            resize: vertical;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--paper);
+            color: var(--ink);
+            font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+
+        #receivePayload {
+            min-height: 160px;
+        }
+
+        .log {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--line);
+        }
+
+        .log h2 {
+            margin-bottom: 8px;
+        }
+
+        #logOutput {
+            min-height: 52px;
+            max-height: 150px;
+            overflow: auto;
+            color: var(--muted);
+            font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: 720px) {
+            header {
+                align-items: flex-start;
+            }
+
+            #connectionStatus {
+                padding-top: 6px;
+            }
+
+            main {
+                margin-top: 18px;
+            }
+
+            .control-layout {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .preview {
+                position: static;
+            }
+
+            .connection-row {
+                align-items: stretch;
+            }
+
+            .tabs {
+                width: 100%;
+            }
+
+            .tab {
+                flex: 1;
+            }
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            main {
+                animation: arrive .35s ease-out both;
+            }
+
+            @keyframes arrive {
+                from {
+                    opacity: 0;
+                    transform: translateY(8px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="brand">
+            <div class="brand-mark" aria-hidden="true">◎</div>
+            <div>
+                <h1>StackChan Control Deck</h1>
+                <div class="subhead">ブラウザ通信テスト</div>
+            </div>
+        </div>
+        <div id="connectionStatus" data-connected="false" role="status">未接続</div>
+    </header>
+    <main>
+        <section class="connection-row" aria-label="接続設定">
+            <div class="tabs" role="tablist" aria-label="接続方式">
+                <button class="tab" id="serialTab" role="tab" aria-selected="true">Web Serial</button>
+                <button class="tab" id="bluetoothTab" role="tab" aria-selected="false">Web Bluetooth</button>
+            </div>
+            <div>
+                <button class="action" id="connectButton">接続</button>
+                <button class="action" id="disconnectButton" disabled>切断</button>
+            </div>
+        </section>
+        <div class="control-layout">
+            <section aria-labelledby="motionHeading">
+                <div class="section-heading">
+                    <h2 id="motionHeading">モーション</h2>
+                    <label class="servo-toggle" for="includeServo"><input id="includeServo" type="checkbox"
+                            checked>サーボを送信</label>
+                </div>
+                <div class="field">
+                    <label for="xRange">X / 左右 <span class="hint">-128〜128°</span></label>
+                    <div class="input-row"><input id="xRange" type="range" min="-128" max="128" step="1"
+                            value="0"><input id="xValue" type="number" min="-128" max="128" step="0.1" value="0"></div>
+                </div>
+                <div class="field">
+                    <label for="yRange">Y / 上下 <span class="hint">5〜85°</span></label>
+                    <div class="input-row"><input id="yRange" type="range" min="5" max="85" step="1" value="30"><input
+                            id="yValue" type="number" min="5" max="85" step="0.1" value="30"></div>
+                </div>
+                <div class="field">
+                    <label for="duration">移動時間</label>
+                    <div class="input-row"><input id="durationRange" type="range" min="100" max="5000" step="100"
+                            value="500"><input id="duration" type="number" min="0" max="60000" step="50" value="500">
+                    </div>
+                </div>
+                <hr>
+                <div class="section-heading">
+                    <h2 id="expressionHeading">表情</h2>
+                    <label class="servo-toggle" for="includeExpression"><input id="includeExpression" type="checkbox"
+                            checked>表情を送信</label>
+                </div>
+                <div class="field">
+                    <select id="expression">
+                        <option value="neutral">neutral</option>
+                        <option value="happy">happy</option>
+                        <option value="happy_heart">happy_heart</option>
+                        <option value="sad">sad</option>
+                        <option value="angry">angry</option>
+                        <option value="surprised">surprised</option>
+                        <option value="sleepy">sleepy</option>
+                        <option value="dizzy">dizzy</option>
+                    </select>
+                </div>
+                <hr>
+                <div class="section-heading">
+                    <h2 id="mouthHeading">口</h2>
+                    <label class="servo-toggle" for="includeMouth"><input id="includeMouth" type="checkbox"
+                            checked>口の開きを送信</label>
+                </div>
+                <div class="field">
+                    <select id="mouthType">
+                        <option value="closed">closed</option>
+                        <option value="open" selected>open</option>
+                        <option value="smile">smile</option>
+                        <option value="round">round</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="mouthRatio">口の開き <span class="hint">0〜100%</span></label>
+                    <div class="input-row"><input id="mouthRatioRange" type="range" min="0" max="100" step="1"
+                            value="0"><input id="mouthRatio" type="number" min="0" max="100" step="1" value="0"></div>
+                </div>
+
+                <hr>
+
+                <div class="send-row">
+                    <div class="send-actions">
+                        <button class="send-button" id="sendButton" disabled>コマンド送信</button>
+                    </div>
+                </div>
+            </section>
+            <aside class="preview">
+                <div class="preview-title">
+                    <h2>送信JSON</h2><span class="live-tag">CONTROL</span>
+                </div>
+                <textarea id="payload" aria-label="送信するJSON" spellcheck="false"></textarea>
+                <div class="preview-title receive-title">
+                    <h2>受信JSON</h2>
+                </div>
+                <textarea id="receivePayload" aria-label="受信したJSON" readonly placeholder="受信待ち"></textarea>
+                <div class="log">
+                    <h2>通信ログ</h2>
+                    <div id="logOutput" aria-live="polite">未接続</div>
+                </div>
+            </aside>
+        </div>
+    </main>
+    <script>
+        const serviceUuid = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+        const rxUuid = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+        const txUuid = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+        const encoder = new TextEncoder();
+        const decoder = new TextDecoder();
+        const elements = Object.fromEntries(['connectionStatus', 'connectButton', 'disconnectButton', 'sendButton', 'payload', 'receivePayload', 'logOutput', 'xRange', 'xValue', 'yRange', 'yValue', 'durationRange', 'duration', 'expression', 'mouthType', 'mouthRatioRange', 'mouthRatio', 'includeServo', 'includeExpression', 'includeMouth', 'serialTab', 'bluetoothTab'].map(id => [id, document.getElementById(id)]));
+        let transport = 'serial';
+        let serialPort;
+        let serialWriter;
+        let serialReader;
+        let serialReadTask;
+        let serialDisconnectRequested = false;
+        let bleDevice;
+        let bleServer;
+        let bleRx;
+        let bleTx;
+        let bleReceivePending = '';
+
+        function log(message) {
+            const time = new Date().toLocaleTimeString();
+            elements.logOutput.textContent = `${time} ${message}\n${elements.logOutput.textContent}`.slice(0, 4000);
+        }
+
+        function setConnected(connected, label = connected ? '接続中' : '未接続') {
+            elements.connectionStatus.dataset.connected = String(connected);
+            elements.connectionStatus.textContent = label;
+            elements.connectButton.disabled = connected;
+            elements.disconnectButton.disabled = !connected;
+            elements.sendButton.disabled = !connected;
+        }
+
+        function updatePayload() {
+            const value = { command: 'control' };
+            if (elements.includeServo.checked) {
+                value.servo = {
+                    x: Number(elements.xValue.value),
+                    y: Number(elements.yValue.value),
+                    duration: Number(elements.duration.value)
+                };
+            }
+            if (elements.includeExpression.checked) value.expression = elements.expression.value;
+            if (elements.includeMouth.checked) {
+                value.mouth = { type: elements.mouthType.value, open_ratio: Number(elements.mouthRatio.value) };
+            }
+            elements.payload.value = JSON.stringify(value, null, 2);
+        }
+
+        function pairInputs(range, number) {
+            range.addEventListener('input', () => { number.value = range.value; updatePayload(); });
+            number.addEventListener('input', () => { range.value = number.value; updatePayload(); });
+        }
+
+        pairInputs(elements.xRange, elements.xValue);
+        pairInputs(elements.yRange, elements.yValue);
+        pairInputs(elements.durationRange, elements.duration);
+        pairInputs(elements.mouthRatioRange, elements.mouthRatio);
+        elements.includeServo.addEventListener('change', updatePayload);
+        elements.includeExpression.addEventListener('change', updatePayload);
+        elements.includeMouth.addEventListener('change', updatePayload);
+        for (const control of [elements.duration, elements.expression, elements.mouthType]) {
+            control.addEventListener('input', updatePayload);
+        }
+        updatePayload();
+
+        elements.serialTab.addEventListener('click', () => selectTransport('serial'));
+        elements.bluetoothTab.addEventListener('click', () => selectTransport('bluetooth'));
+        function selectTransport(next) {
+            if (elements.disconnectButton.disabled === false) return;
+            transport = next;
+            elements.serialTab.setAttribute('aria-selected', String(next === 'serial'));
+            elements.bluetoothTab.setAttribute('aria-selected', String(next === 'bluetooth'));
+            elements.connectButton.textContent = next === 'serial' ? 'シリアル接続' : 'Bluetooth接続';
+        }
+        selectTransport('serial');
+
+        elements.connectButton.addEventListener('click', async () => {
+            try {
+                if (transport === 'serial') await connectSerial();
+                else await connectBluetooth();
+            } catch (error) {
+                log(`接続エラー: ${error.message}`);
+            }
+        });
+
+        async function connectSerial() {
+            if (!('serial' in navigator)) throw new Error('Web Serial非対応です。ChromeまたはEdgeを使用してください');
+            serialPort = await navigator.serial.requestPort();
+            await serialPort.open({ baudRate: 115200 });
+            serialWriter = serialPort.writable.getWriter();
+            serialDisconnectRequested = false;
+            serialReadTask = readSerialLoop();
+            setConnected(true, 'Web Serial 接続中');
+            log('シリアル接続');
+        }
+
+        async function readSerialLoop() {
+            let partial = '';
+            while (!serialDisconnectRequested && serialPort?.readable) {
+                const reader = serialPort.readable.getReader();
+                serialReader = reader;
+                try {
+                    while (!serialDisconnectRequested) {
+                        const { value, done } = await reader.read();
+                        if (done) return;
+                        partial += decoder.decode(value, { stream: true });
+                        const lines = partial.split(/\r?\n/);
+                        partial = lines.pop();
+                        for (const line of lines.filter(Boolean)) logReceived(line);
+                    }
+                } catch (error) {
+                    if (!serialDisconnectRequested) log(`シリアル受信エラー: ${error.message}`);
+                    return;
+                } finally {
+                    if (serialReader === reader) serialReader = undefined;
+                    reader.releaseLock();
+                }
+            }
+        }
+
+        function logReceived(payload) {
+            let message;
+            try {
+                message = JSON.parse(payload);
+                elements.receivePayload.value = JSON.stringify(message, null, 2);
+            } catch (error) {
+                elements.receivePayload.value = payload;
+            }
+            log(`RX ${payload}`);
+        }
+
+        function receiveBluetoothChunk(value) {
+            bleReceivePending += decoder.decode(value, { stream: true });
+            const frames = bleReceivePending.split(/\r?\n/);
+            bleReceivePending = frames.pop();
+            for (const frame of frames.filter(Boolean)) logReceived(frame);
+        }
+
+        async function stopSerialConnection(closePort) {
+            const port = serialPort;
+            serialDisconnectRequested = true;
+            try {
+                try {
+                    await serialReader?.cancel();
+                } catch (error) {
+                    log(`シリアル受信停止エラー: ${error.message}`);
+                }
+                try {
+                    await serialReadTask;
+                } catch (error) {
+                    log(`シリアル受信終了エラー: ${error.message}`);
+                }
+                serialReader = undefined;
+                serialReadTask = undefined;
+                try {
+                    serialWriter?.releaseLock();
+                } catch (error) {
+                    log(`シリアル送信解放エラー: ${error.message}`);
+                }
+                serialWriter = undefined;
+                if (closePort && port) await port.close();
+            } finally {
+                serialPort = undefined;
+                serialDisconnectRequested = false;
+            }
+        }
+
+        async function connectBluetooth() {
+            if (!('bluetooth' in navigator)) throw new Error('Web Bluetooth非対応です。ChromeまたはEdgeを使用してください');
+            bleDevice = await navigator.bluetooth.requestDevice({ filters: [{ services: [serviceUuid] }] });
+            bleDevice.addEventListener('gattserverdisconnected', () => {
+                setConnected(false);
+                log('Bluetooth切断');
+            });
+            bleServer = await bleDevice.gatt.connect();
+            const service = await bleServer.getPrimaryService(serviceUuid);
+            bleRx = await service.getCharacteristic(rxUuid);
+            bleTx = await service.getCharacteristic(txUuid);
+            bleReceivePending = '';
+            await bleTx.startNotifications();
+            bleTx.addEventListener('characteristicvaluechanged', event => {
+                receiveBluetoothChunk(event.target.value);
+            });
+            setConnected(true, 'Web Bluetooth 接続中');
+            log(`Bluetooth接続: ${bleDevice.name || 'StackChan'}`);
+        }
+
+        elements.sendButton.addEventListener('click', async () => {
+            try {
+                const payload = JSON.stringify(JSON.parse(elements.payload.value));
+                if (transport === 'serial') {
+                    await serialWriter.write(encoder.encode(`${payload}\n`));
+                } else {
+                    await bleRx.writeValueWithResponse(encoder.encode(payload));
+                }
+                log(`TX ${payload}`);
+            } catch (error) {
+                log(`送信エラー: ${error.message}`);
+            }
+        });
+
+        elements.disconnectButton.addEventListener('click', async () => {
+            if (transport === 'serial' && serialPort) {
+                try {
+                    await stopSerialConnection(true);
+                } catch (error) {
+                    log(`シリアル切断エラー: ${error.message}`);
+                }
+            } else if (bleDevice?.gatt?.connected) {
+                bleDevice.gatt.disconnect();
+                bleReceivePending = '';
+            }
+            setConnected(false);
+            log('切断しました');
+        });
+
+        if ('serial' in navigator) {
+            navigator.serial.addEventListener('disconnect', event => {
+                if (event.target !== serialPort || serialDisconnectRequested) return;
+                setConnected(false);
+                log('シリアル切断');
+                void stopSerialConnection(false);
+            });
+        }
+    </script>
+</body>
+
+</html>
