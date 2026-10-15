@@ -76,7 +76,15 @@ function App() {
         onReceive: (message) => {
           console.log(`StackChan ${transport} RX:`, message);
           const wrapper = _stackChanRefs.current[transport];
-          if (!wrapper?.connected || typeof message?.ok === "boolean") return;
+          const events = message?.events;
+          const hasSensorEvent = message?.type === "events" && events && (
+            events.touch_front > 0 ||
+            events.touch_middle > 0 ||
+            events.touch_back > 0 ||
+            events.touch_click > 0 ||
+            events.shake === 1
+          );
+          if (!wrapper?.connected || !hasSensorEvent) return;
           clearTimeout(reaction.timeout);
           reaction.timeout = setTimeout(() => {
             reaction.timeout = null;

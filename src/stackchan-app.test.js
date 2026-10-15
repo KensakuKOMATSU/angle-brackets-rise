@@ -119,6 +119,19 @@ test.each([
   if (expectedSends) expect(wrapper.send).toHaveBeenCalledWith({ expression: "happy_heart", mouth: { type: "smile" } });
 });
 
+test.each(["StackChan-BT", "StackChan-Serial"])("%s ignores connection-ready and inactive sensor messages", async (label) => {
+  await renderApp();
+  fireEvent.click(screen.getByRole("switch", { name: label }));
+  await waitFor(() => expect(screen.getByRole("switch", { name: label })).toBeChecked());
+  const wrapper = StackChanWrapper.mock.results[0].value;
+  act(() => {
+    wrapper.onReceive({ ready: true, mode: "serial" });
+    wrapper.onReceive({ type: "events", events: { touch_front: 0, touch_middle: 0, touch_back: 0, touch_click: 0, shake: 0 } });
+    wrapper.onReceive({ ok: true, expression: "neutral" });
+  });
+  expect(wrapper.send).not.toHaveBeenCalled();
+});
+
 test("Bluetooth command replies and notifications after disconnection do not trigger heart commands", async () => {
   await renderApp();
   fireEvent.click(screen.getByRole("switch", { name: "StackChan-BT" }));
@@ -128,6 +141,7 @@ test("Bluetooth command replies and notifications after disconnection do not tri
     wrapper.onReceive({ ok: true, expression: "happy_heart" });
     wrapper.onReceive({ ok: true, expression: "neutral" });
     wrapper.onReceive({ ok: false, error: "invalid command" });
+    wrapper.onReceive({ type: "events", events: { shake: 0 } });
     wrapper.connected = false;
     wrapper.onReceive({ type: "events", events: { touch_front: 1 } });
   });
